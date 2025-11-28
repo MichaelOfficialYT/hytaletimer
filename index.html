@@ -118,6 +118,27 @@
             margin-bottom: 15px;
             letter-spacing: 1px;
             transition: color 1s;
+            /* Nuovi stili per effetto macchina da scrivere */
+            height: 1.2em; /* Mantiene l'altezza fissa */
+            white-space: nowrap; /* Mantiene il testo su una riga */
+            overflow: hidden; /* Nasconde il testo non ancora "battuto" */
+            display: inline-block;
+            max-width: 90vw; /* Limite per evitare overflow su schermi stretti */
+        }
+        
+        /* Cursore lampeggiante */
+        .cursor {
+            font-weight: 300;
+            display: inline-block;
+            animation: blink 0.7s infinite step-end;
+            margin-left: 2px;
+            color: #00e5ff;
+            vertical-align: top;
+        }
+        
+        @keyframes blink {
+            from, to { opacity: 0; }
+            50% { opacity: 1; }
         }
 
         p.timezone-info {
@@ -175,7 +196,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* --- EFFETTI AURA ORARIA --- */
+        /* --- EFFETTI AURA ORARIA / CRITICA (Invariati) --- */
         body.aura-19 h1 { text-shadow: 0 0 15px rgba(0, 229, 255, 0.8); }
         body.aura-18 h1 { letter-spacing: 4px; text-shadow: 0 0 20px rgba(0, 229, 255, 1); }
         
@@ -192,7 +213,6 @@
             animation: slightTremble 0.3s infinite alternate;
         }
 
-        /* --- SOGLIA CRITICA --- */
         body.critical .bg-gradient {
             background: radial-gradient(circle at center, rgba(58, 31, 71, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%); 
         }
@@ -209,16 +229,6 @@
             animation: warningGlow 1s infinite alternate;
         }
         
-        @keyframes warningGlow {
-            from { text-shadow: 0 0 10px rgba(255, 87, 87, 0.5); }
-            to { text-shadow: 0 0 25px rgba(255, 87, 87, 1); }
-        }
-        
-        @keyframes warningGlowLogo {
-            from { filter: drop-shadow(0 0 10px rgba(255, 87, 87, 0.5)); }
-            to { filter: drop-shadow(0 0 25px rgba(255, 87, 87, 1)); }
-        }
-
         body.critical .number {
             color: #ffaa00;
             text-shadow: 0 0 15px #ffaa00, 0 0 25px rgba(255, 170, 0, 0.7);
@@ -236,10 +246,6 @@
             z-index: 100;
             font-size: 12px;
             display: none;
-        }
-        #debug-controls label {
-            display: block;
-            margin-top: 5px;
         }
         
         @media (max-width: 768px) {
@@ -261,7 +267,11 @@
     <div class="container" id="main-container">
         <img id="hytale-logo" src="https://hytale.com/static/images/logo.png" alt="Hytale Logo">
         <h1 id="main-title">APERTURA PREORDINI</h1>
-        <p class="subtitle" id="subtitle-text">Assicurati il tuo posto su Orbis prima di chiunque altro.</p>
+        
+        <p class="subtitle" id="subtitle-text">
+            <span id="typed-text"></span><span class="cursor">|</span>
+        </p>
+
         <p class="timezone-info" id="date-info">Inizio Prevendita: 13 Dicembre 2025, 16:00 CET</p>
         
         <div class="timer-wrapper">
@@ -300,11 +310,11 @@
     </div>
 
     <script>
-        // --- 1. COUNTDOWN LOGIC ---
+        // --- 1. COUNTDOWN E LOGICA TESTUALE ---
         
         // CONFIGURAZIONE DATE
-        const targetDate1 = new Date('2025-12-13T15:00:00Z'); // PREORDER
-        const targetDate2 = new Date('2026-01-13T15:00:00Z'); // EARLY ACCESS
+        const targetDate1 = new Date('2025-12-13T15:00:00Z'); // PREORDER (16:00 CET)
+        const targetDate2 = new Date('2026-01-13T15:00:00Z'); // EARLY ACCESS (16:00 CET)
 
         let currentPhase = 1;
         let activeTarget = targetDate1;
@@ -318,14 +328,76 @@
         const boxHours = document.getElementById('box-hours');
         const boxDays = document.getElementById('box-days'); 
         const container = document.getElementById('main-container');
+
+        // ELEMENTI PER TYPING EFFECT
+        const typedTextSpan = document.getElementById('typed-text');
         
+        const phrasesPhase1 = [
+            "Esplora un nuovo mondo. Orbis ti aspetta.",
+            "Crea la tua leggenda. Diventa ciò che vuoi.",
+            "Combatti, costruisci, avventura. Hytale è qui.",
+            "L'attesa sta per finire. Prepara il tuo zaino."
+        ];
+        
+        const phrasesPhase2 = [
+            "Preordini aperti. Preparati all'Early Access.",
+            "Il conto alla rovescia finale per l'accesso è iniziato.",
+            "I portali sono stabili. La Beta è vicina.",
+            "Scopri le zone, incontra le creature di Orbis."
+        ];
+
+        let typingInterval;
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
         let lastSeconds = -1;
         let lastMinutes = -1;
         let lastHours = -1;
         let lastDays = -1;
-
         let isTransitioning = false;
         let debugClass = '';
+
+        function typeWriterEffect(phrases) {
+            clearTimeout(typingInterval); 
+            
+            const currentPhrase = phrases[phraseIndex];
+            
+            if (isDeleting) {
+                // Erase mode
+                charIndex--;
+                typedTextSpan.textContent = currentPhrase.substring(0, charIndex);
+                
+                if (charIndex <= 0) {
+                    isDeleting = false;
+                    phraseIndex = (phraseIndex + 1) % phrases.length;
+                    typingInterval = setTimeout(() => typeWriterEffect(phrases), 500); // Pausa prima di digitare
+                    return;
+                }
+            } else {
+                // Typing mode
+                charIndex++;
+                typedTextSpan.textContent = currentPhrase.substring(0, charIndex);
+                
+                if (charIndex === currentPhrase.length) {
+                    isDeleting = true;
+                    typingInterval = setTimeout(() => typeWriterEffect(phrases), 2500); // Pausa dopo aver digitato
+                    return;
+                }
+            }
+            
+            const typingSpeed = isDeleting ? 30 : 70; // Velocità di cancellazione / digitazione
+            typingInterval = setTimeout(() => typeWriterEffect(phrases), typingSpeed);
+        }
+
+        function startTyping(phrases) {
+            clearTimeout(typingInterval);
+            phraseIndex = 0;
+            charIndex = 0;
+            isDeleting = false;
+            typedTextSpan.textContent = ''; 
+            typeWriterEffect(phrases);
+        }
 
         function applyDebugClass(className) {
             document.body.classList.remove('critical', 'aura-19', 'aura-18', 'aura-17', 'aura-16');
@@ -364,6 +436,7 @@
         function switchPhase() {
             isTransitioning = true;
             container.classList.add('fading-out');
+            clearTimeout(typingInterval); // Ferma l'effetto macchina da scrivere
 
             setTimeout(() => {
                 // CAMBIO FASE E TESTI
@@ -375,8 +448,10 @@
                 resetColors();
 
                 document.getElementById('main-title').innerText = "PREPARATI AL LANCIO";
-                document.getElementById('subtitle-text').innerText = "I preordini sono aperti. Il conto alla rovescia finale per l'accesso è iniziato.";
                 document.getElementById('date-info').innerText = "Rilascio Early Access: 13 Gennaio 2026, 16:00 CET";
+                
+                // Riavvia il typing effect con le frasi della Fase 2
+                startTyping(phrasesPhase2); 
                 
                 updateTimerNumsOnly();
 
@@ -420,6 +495,7 @@
                      return;
                  } else {
                      // FASE 2 COMPLETATA (Early Access)
+                     clearTimeout(typingInterval);
                      document.getElementById("days").innerText = "00";
                      document.getElementById("hours").innerText = "00";
                      document.getElementById("minutes").innerText = "00";
@@ -488,6 +564,9 @@
 
         setInterval(updateTimer, 1000);
         updateTimer();
+
+        // --- INIZIALIZZAZIONE EFFETTO MACCHINA DA SCRIVERE ---
+        startTyping(phrasesPhase1);
 
         // --- 2. MAGIC PARTICLES SYSTEM (Invariato) ---
         const canvas = document.getElementById("canvas");
