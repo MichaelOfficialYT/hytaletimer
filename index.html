@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hytale Countdown - Preorder & Early Access</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Hytale Countdown - Early Access</title>
+    
+    <link href="https://fonts.cdnfonts.com/css/friz-quadrata-std" rel="stylesheet">
 
     <style>
         /* --- STILI BASE --- */
@@ -17,262 +16,179 @@
             height: 100%;
             background-color: #050508;
             overflow: hidden;
-            font-family: 'Penumbra Serif Std', 'Cinzel', serif;
+            font-family: 'Friz Quadrata Std', serif; 
             transition: background-color 2s ease-in-out;
             perspective: 1000px;
         }
 
-        /* SFONDO DINAMICO E PARALLASSE */
+        /* OVERLAY VARI */
+        #flash-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: white; opacity: 0; pointer-events: none; z-index: 100;
+            transition: opacity 1.5s ease-out;
+        }
+
+        .vignette-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 20;
+            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.8) 100%);
+            opacity: 0.5; transition: box-shadow 0.5s, opacity 0.5s;
+        }
+
         .bg-img-placeholder {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://upload.wikimedia.org/wikipedia/en/thumb/9/91/Hytale_logo.svg/1200px-Hytale_logo.svg.png'); 
-            background-size: cover;
-            background-position: center;
-            filter: blur(5px);
-            opacity: 0.2; 
-            z-index: 1;
-            transition: opacity 2s ease-in-out, transform 0.1s linear;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://cdn.hytale.com/5c17d2165a250300122a1670_hytale_logo_hero.jpg');
+            background-size: cover; background-position: center;
+            filter: blur(5px); opacity: 0.2; z-index: 1;
+            transition: opacity 2s ease-in-out, transform 5s ease-in-out;
         }
         
         .bg-gradient {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, rgba(27, 40, 56, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%);
-            z-index: 2;
-            transition: background 2s ease-in-out, transform 0.1s linear;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(30, 40, 60, 0.9) 0%, rgba(5, 5, 8, 0.98) 100%);
+            z-index: 2; transition: background 2s ease-in-out;
         }
 
-        /* CANVAS PARTICELLE */
-        canvas {
-            display: block;
-            position: absolute;
-            top: 0; left: 0;
-            z-index: 5;
-            pointer-events: none;
-            opacity: 1; 
-            transition: opacity 2s ease-in-out;
-        }
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 5; pointer-events: none; }
 
-        /* CONTENITORE UI */
         .container {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-            color: #ffffff;
-            pointer-events: none;
-            transition: opacity 1.5s ease-in-out, filter 1.5s ease-in-out; 
-            opacity: 1;
-            padding: 0 20px;
-        }
-        
-        .container.fading-out {
-            opacity: 0;
-            filter: blur(10px);
+            position: relative; z-index: 10; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; height: 100vh;
+            text-align: center; color: #ffffff;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
         }
 
-        /* --- STILE LOGO Hytale --- */
         #hytale-logo {
-            width: 300px;
-            height: auto;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.7)); 
-            animation: fadeIn 2s ease-out forwards, float 4s ease-in-out infinite alternate; 
-            transition: filter 0.5s ease-in-out;
+            width: 380px; height: auto; margin-bottom: 25px;
+            filter: drop-shadow(0 0 15px rgba(252, 209, 91, 0.4)); 
+            transition: filter 0.5s, transform 0.1s;
+            animation: float 4s ease-in-out infinite alternate;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0px); }
-        }
+        @keyframes float { 0% { transform: translateY(0px); } 100% { transform: translateY(-10px); } }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); } 
-            100% { transform: translateY(0px); }
-        }
-
-        /* TESTI E TIMER */
         h1 {
-            font-size: 3rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: #fff;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); 
-            border-bottom: 2px solid #00e5ff;
-            padding-bottom: 15px;
-            display: inline-block;
-            transition: color 2s ease-in-out, border-color 2s ease-in-out, text-shadow 0.5s;
-            font-weight: 700;
+            font-size: 3.8rem; text-transform: uppercase; letter-spacing: 1px;
+            color: #FCD15B; margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(252, 209, 91, 0.4); 
+            border-bottom: 2px solid #FCD15B; padding-bottom: 15px;
+            display: inline-block; font-weight: 700;
+            transition: all 0.5s ease; position: relative;
         }
         
+        /* --- STILE SOTTOTITOLO AGGIORNATO (MAIUSCOLO) --- */
         p.subtitle {
-            font-size: 1.2rem;
-            color: #aabccd;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-            transition: color 1s;
-            /* Nuovi stili per effetto macchina da scrivere */
-            height: 1.2em; /* Mantiene l'altezza fissa */
-            white-space: nowrap; /* Mantiene il testo su una riga */
-            overflow: hidden; /* Nasconde il testo non ancora "battuto" */
-            display: inline-block;
-            max-width: 90vw; /* Limite per evitare overflow su schermi stretti */
+            font-size: 1.4rem; 
+            color: #E6E6E6; 
+            margin-bottom: 20px;
+            letter-spacing: 2px; /* Spaziatura aumentata per leggibilità in maiuscolo */
+            min-height: 1.4em; 
+            font-weight: 400;
+            text-transform: uppercase; /* Rende tutto MAIUSCOLO */
         }
-        
-        /* Cursore lampeggiante */
-        .cursor {
-            font-weight: 300;
-            display: inline-block;
-            animation: blink 0.7s infinite step-end;
-            margin-left: 2px;
-            color: #00e5ff;
-            vertical-align: top;
-        }
-        
-        @keyframes blink {
-            from, to { opacity: 0; }
-            50% { opacity: 1; }
-        }
+
+        .dud { color: #a8905e; opacity: 0.6; }
 
         p.timezone-info {
-            font-size: 0.8rem;
-            color: #7a8a9a;
-            margin-bottom: 40px;
-            transition: color 1s;
+            font-size: 0.9rem; color: #E6E6E6; margin-bottom: 50px;
+            font-weight: 400; font-style: italic; opacity: 0.8;
         }
 
-        .timer-wrapper {
-            display: flex;
-            gap: 20px;
-            pointer-events: auto;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .time-box {
-            background: rgba(10, 15, 25, 0.85);
-            border: 1px solid #6d5840;
-            padding: 20px;
-            min-width: 90px;
-            border-radius: 6px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.8);
-            position: relative;
-            transition: opacity 0.5s, transform 0.5s;
-        }
-
-        .number {
-            display: block;
-            font-size: 3.5rem;
-            font-weight: bold;
-            color: #00e5ff;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); 
-            transition: color 1s ease-in-out, text-shadow 1s ease-in-out, transform 0.1s;
-        }
-
-        /* --- ANIMAZIONE SPARKLE --- */
-        .sparkle .number {
-            animation: sparkleGlow 0.5s ease-out;
-        }
-
-        @keyframes sparkleGlow {
-            0% { transform: scale(1); opacity: 1; text-shadow: 0 0 5px rgba(0, 229, 255, 0.3); }
-            50% { transform: scale(1.05); opacity: 1; text-shadow: 0 0 20px #ffffff; }
-            100% { transform: scale(1); opacity: 1; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
-        }
-        
-        .label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
+        /* --- STILE DISCLAIMER LEGALE --- */
+        .legal-disclaimer {
+            margin-top: 40px;
+            font-size: 0.75rem;
             color: #888;
-            margin-top: 5px;
-            display: block;
+            opacity: 0.7;
+            line-height: 1.6;
+            font-weight: 400;
+            text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        /* --- EFFETTI AURA ORARIA / CRITICA (Invariati) --- */
-        body.aura-19 h1 { text-shadow: 0 0 15px rgba(0, 229, 255, 0.8); }
-        body.aura-18 h1 { letter-spacing: 4px; text-shadow: 0 0 20px rgba(0, 229, 255, 1); }
-        
-        body.aura-17 h1 { animation: slightTremble 0.5s infinite alternate; }
-        @keyframes slightTremble {
-            0% { transform: translateX(0px); }
-            100% { transform: translateX(1px) translateY(1px); }
+        .timer-wrapper { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; }
+
+        .time-box {
+            background-color: rgba(24, 34, 49, 0.9);
+            border: 2px solid #6d5840; 
+            padding: 25px; min-width: 110px; border-radius: 6px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.6);
+            position: relative;
+            transition: border-color 1s, box-shadow 1s, background-color 1s;
         }
 
-        body.aura-16 h1 {
-            color: #a0c4ff;
-            border-color: #a0c4ff;
-            text-shadow: 0 0 25px rgba(160, 196, 255, 0.8);
-            animation: slightTremble 0.3s infinite alternate;
-        }
-
-        body.critical .bg-gradient {
-            background: radial-gradient(circle at center, rgba(58, 31, 71, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%); 
-        }
-
-        body.critical #hytale-logo {
-            filter: drop-shadow(0 0 25px rgba(255, 87, 87, 1));
-            animation: warningGlowLogo 1.5s infinite alternate, float 4s ease-in-out infinite alternate;
+        .number {
+            display: block; font-size: 4.2rem; font-weight: 700; 
+            color: #FCD15B; text-shadow: 0 0 15px rgba(252, 209, 91, 0.3); 
+            transition: color 1s, text-shadow 1s;
         }
         
-        body.critical h1 {
-            color: #ff5757;
-            border-color: #ff5757;
-            text-shadow: 0 0 25px rgba(255, 87, 87, 1);
-            animation: warningGlow 1s infinite alternate;
+        .label {
+            font-size: 1rem; text-transform: uppercase; color: #E6E6E6;
+            margin-top: 5px; display: block; letter-spacing: 1px; font-weight: 700;
         }
-        
-        body.critical .number {
-            color: #ffaa00;
-            text-shadow: 0 0 15px #ffaa00, 0 0 25px rgba(255, 170, 0, 0.7);
-        }
+
+        /* STILI FASI */
+        body.phase-week .bg-gradient { background: radial-gradient(circle at center, rgba(10, 40, 20, 0.9) 0%, rgba(2, 15, 5, 0.98) 100%); }
+        body.phase-week h1 { color: #5eff80; border-color: #5eff80; text-shadow: 0 0 20px rgba(0, 255, 100, 0.6); }
+        body.phase-week .time-box { border-color: #2eff50; box-shadow: 0 0 20px rgba(46, 255, 80, 0.2); }
+        body.phase-week .number { color: #ccffda; text-shadow: 0 0 15px #00ff55; }
+
+        body.phase-24h .bg-gradient { background: radial-gradient(circle at center, rgba(60, 30, 10, 0.9) 0%, rgba(20, 5, 0, 0.98) 100%); }
+        body.phase-24h h1 { color: #ffae00; border-color: #ffae00; text-shadow: 0 0 25px rgba(255, 140, 0, 0.8); }
+        body.phase-24h .time-box { border-color: #ffae00; box-shadow: 0 0 25px rgba(255, 174, 0, 0.3); }
+        body.phase-24h .number { color: #fffbd0; text-shadow: 0 0 20px #ffae00; }
+
+        body.aura-19 .bg-gradient { background: radial-gradient(circle at center, rgba(20, 40, 60, 0.9) 0%, rgba(2, 10, 20, 0.98) 100%); }
+        body.aura-19 h1 { color: #a0eaff; border-color: #a0eaff; text-shadow: 0 0 20px rgba(0, 229, 255, 0.8); animation: pulseText 3s infinite ease-in-out; }
+        body.aura-19 .time-box { border-color: #00e5ff; box-shadow: 0 0 25px rgba(0, 229, 255, 0.3); }
+        body.aura-19 .number { color: #e0fbff; text-shadow: 0 0 15px #00e5ff; }
+
+        body.aura-18 .bg-gradient { background: radial-gradient(circle at center, rgba(40, 20, 60, 0.9) 0%, rgba(10, 2, 20, 0.98) 100%); }
+        body.aura-18 h1 { color: #d8a0ff; border-color: #d8a0ff; text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff; animation: glitchSkew 2s infinite linear alternate-reverse; }
+        body.aura-18 .time-box { border-color: #be5eff; box-shadow: 0 0 20px rgba(190, 94, 255, 0.4); }
+        body.aura-18 .number { color: #f0d0ff; text-shadow: 2px 0 #ff00de, -2px 0 #00ffff; }
+
+        body.critical .vignette-overlay { box-shadow: inset 0 0 150px rgba(255, 0, 0, 0.6); background: radial-gradient(circle, transparent 40%, rgba(50, 0, 0, 0.9) 100%); animation: redAlert 1s infinite alternate; }
+        body.critical .bg-gradient { background: radial-gradient(circle at center, rgba(60, 10, 10, 0.9) 0%, rgba(0, 0, 0, 1) 100%); }
+        body.critical h1 { color: #ff3333; border-color: #ff3333; text-shadow: 0 0 30px #ff0000; animation: criticalShake 0.4s infinite; }
+        body.critical .time-box { background-color: rgba(40, 10, 10, 0.9); border-color: #ff3333; box-shadow: 0 0 40px rgba(255, 0, 0, 0.5); animation: boxPulse 0.5s infinite alternate; }
+        body.critical .number { color: #ffaa00; text-shadow: 0 0 20px #ff3333; }
+
+        @keyframes pulseText { 0% { text-shadow: 0 0 20px rgba(0, 229, 255, 0.6); transform: scale(1); } 50% { text-shadow: 0 0 40px rgba(0, 229, 255, 1); transform: scale(1.02); } 100% { transform: scale(1); } }
+        @keyframes glitchSkew { 0%, 100% { transform: skew(0deg); } 20% { transform: skew(-2deg); } 80% { transform: skew(2deg); } }
+        @keyframes criticalShake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, -1px); } }
+        @keyframes redAlert { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes boxPulse { 0% { border-color: #ff3333; } 100% { border-color: #ffaa00; } }
 
         /* DEBUG CONTROLS */
-        #debug-controls {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border-radius: 5px;
-            color: white;
-            z-index: 100;
-            font-size: 12px;
-            display: none;
-        }
+        #debug-controls { position: fixed; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 5px; color: white; z-index: 100; font-size: 12px; display: none; }
         
         @media (max-width: 768px) {
-            #hytale-logo { width: 200px; margin-bottom: 15px;}
-            h1 { font-size: 1.8rem; }
-            .timer-wrapper { gap: 10px; }
-            .time-box { min-width: 60px; padding: 15px; }
-            .number { font-size: 2rem; }
+            #hytale-logo { width: 220px; margin-bottom: 20px;}
+            h1 { font-size: 2rem; }
+            .timer-wrapper { gap: 15px; }
+            .time-box { min-width: 70px; padding: 15px; }
+            .number { font-size: 2.5rem; }
         }
     </style>
 </head>
 <body>
 
+    <div id="flash-overlay"></div>
+    <div class="vignette-overlay"></div>
     <div class="bg-img-placeholder" id="bg-img-placeholder"></div>
     <div class="bg-gradient" id="bg-gradient"></div>
-    
     <canvas id="canvas"></canvas>
 
     <div class="container" id="main-container">
         <img id="hytale-logo" src="https://hytale.com/static/images/logo.png" alt="Hytale Logo">
-        <h1 id="main-title">APERTURA PREORDINI</h1>
         
-        <p class="subtitle" id="subtitle-text">
-            <span id="typed-text"></span><span class="cursor">|</span>
-        </p>
+        <h1 id="main-title">PREPARATI AL LANCIO</h1>
+        
+        <p class="subtitle" id="scramble-text"></p>
 
-        <p class="timezone-info" id="date-info">Inizio Prevendita: 13 Dicembre 2025, 16:00 CET</p>
+        <p class="timezone-info" id="date-info">Rilascio Early Access: 13 Gennaio 2026, 16:00 CET</p>
         
         <div class="timer-wrapper">
             <div class="time-box" id="box-days">
@@ -293,158 +209,118 @@
                 <span class="label">Secondi</span>
             </div>
         </div>
+        
+        <div class="legal-disclaimer">
+            This site is not affiliated with Hytale or Hypixel Studios<br>
+            Some media are trademarked property of Hypixel Studios!
+        </div>
     </div>
     
     <div id="debug-controls">
         <strong>DEBUG (Ctrl+D)</strong>
-        <label>Forza Classe CSS:</label>
+        <label>Forza Fase:</label>
         <select id="debug-class-selector" onchange="applyDebugClass(this.value)">
-            <option value="">-- Normale --</option>
-            <option value="aura-19">Aura <= 19h</option>
-            <option value="aura-18">Aura <= 18h</option>
-            <option value="critical">Critico <= 1h</option>
+            <option value="">-- Normale (Oro) --</option>
+            <option value="phase-week">1 Settimana (Verde)</option>
+            <option value="phase-24h">24 Ore (Arancio)</option>
+            <option value="aura-19">Aura 19h (Blu)</option>
+            <option value="aura-18">Aura 18h (Viola)</option>
+            <option value="critical">Critico 1h (Rosso)</option>
         </select>
         <div style="margin-top:10px; border-top:1px solid #555; padding-top:5px;">
-            <button onclick="skipPhase()">Salta Fase Corrente (Test)</button>
+            <button onclick="skipPhase()">FUOCHI D'ARTIFICIO (Test)</button>
         </div>
     </div>
 
     <script>
-        // --- 1. COUNTDOWN E LOGICA TESTUALE ---
-        
-        // CONFIGURAZIONE DATE
-        const targetDate1 = new Date('2025-12-13T15:00:00Z'); // PREORDER (16:00 CET)
-        const targetDate2 = new Date('2026-01-13T15:00:00Z'); // EARLY ACCESS (16:00 CET)
-
-        let currentPhase = 1;
-        let activeTarget = targetDate1;
-
-        const CRITICAL_THRESHOLD_MS = 60 * 60 * 1000;
-        let isCritical = false;
-        let lastHoursRemaining = 999; 
-        
-        const boxSeconds = document.getElementById('box-seconds');
-        const boxMinutes = document.getElementById('box-minutes');
-        const boxHours = document.getElementById('box-hours');
-        const boxDays = document.getElementById('box-days'); 
-        const container = document.getElementById('main-container');
-
-        // ELEMENTI PER TYPING EFFECT
-        const typedTextSpan = document.getElementById('typed-text');
-        
-const phrasesPhase1 = [
-    "Hytale è stato riacquistato dai creatori originali.",  
-    "Il mondo di Orbis torna in sviluppo con regioni riviste e biomi ridefiniti.",  
-    "Il sistema di modding resta fondamentale e sarà disponibile fin dall’Early Access.",  
-    "Esplora, costruisci e crea contenuti — la community e i server personalizzati sono nel cuore del progetto.",  
-    "Il gameplay sandbox con crafting e building è in fase di rifinitura in vista dell’Early Access."
-];
-
-const phrasesPhase2 = [
-"Orbis ti sta aspettando.",
-"L'ombra di Varyn si avvicina.",
-"Ogni blocco racconta una storia.",
-"Preparati a varcare il portale.",
-"L'avventura di una vita sta per iniziare.",
-"Scopri i segreti degli elementi.",
-"La leggenda sta per essere scritta.",
-"Dalle profondità dei dungeon alle vette più alte.",
-"Affila la spada, i nemici sono in agguato.",
-"Costruisci il tuo mondo, blocco dopo blocco.",
-"Esplora terre sconosciute e pericolose.",
-"Raccogli, crea, combatti, sopravvivi.",
-"Scatena la tua creatività senza limiti.",
-"Prepara l'inventario, si parte.",
-"Raduna il tuo party, la sfida inizia.",
-"Non calpestare i Kweebec!",
-"Attento ai Trork nella foresta.",
-"Hai portato abbastanza torce?",
-"Non disturbare i Mosshorn.",
-"Saluta i tuoi futuri vicini di casa.",
-"Speriamo di non incontrare ragni giganti...",
-"I piccioni di Hytale ti osservano.",
-"Manca sempre meno al lancio.",
-"Tieniti pronto, ci siamo quasi.",
-"L'attesa sta per finire.",
-"Caricamento del mondo in corso...",
-"Stiamo generando i biomi."
-];
-
-
-        let typingInterval;
-        let phraseIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-
-        let lastSeconds = -1;
-        let lastMinutes = -1;
-        let lastHours = -1;
-        let lastDays = -1;
-        let isTransitioning = false;
-        let debugClass = '';
-
-        function typeWriterEffect(phrases) {
-            clearTimeout(typingInterval); 
-            
-            const currentPhrase = phrases[phraseIndex];
-            
-            if (isDeleting) {
-                // Erase mode
-                charIndex--;
-                typedTextSpan.textContent = currentPhrase.substring(0, charIndex);
-                
-                if (charIndex <= 0) {
-                    isDeleting = false;
-                    phraseIndex = (phraseIndex + 1) % phrases.length;
-                    typingInterval = setTimeout(() => typeWriterEffect(phrases), 500); // Pausa prima di digitare
-                    return;
-                }
-            } else {
-                // Typing mode
-                charIndex++;
-                typedTextSpan.textContent = currentPhrase.substring(0, charIndex);
-                
-                if (charIndex === currentPhrase.length) {
-                    isDeleting = true;
-                    typingInterval = setTimeout(() => typeWriterEffect(phrases), 2500); // Pausa dopo aver digitato
-                    return;
-                }
+        // --- TEXT SCRAMBLE ---
+        class TextScramble {
+            constructor(el) {
+                this.el = el;
+                this.chars = '!<>-_\\/[]{}—=+*^?#________'; 
+                this.update = this.update.bind(this);
             }
-            
-            const typingSpeed = isDeleting ? 30 : 70; // Velocità di cancellazione / digitazione
-            typingInterval = setTimeout(() => typeWriterEffect(phrases), typingSpeed);
+            setText(newText) {
+                const oldText = this.el.innerText;
+                const length = Math.max(oldText.length, newText.length);
+                const promise = new Promise((resolve) => this.resolve = resolve);
+                this.queue = [];
+                for (let i = 0; i < length; i++) {
+                    const from = oldText[i] || '';
+                    const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 100); 
+                    const end = start + Math.floor(Math.random() * 120) + 60; 
+                    this.queue.push({ from, to, start, end });
+                }
+                cancelAnimationFrame(this.frameRequest);
+                this.frame = 0;
+                this.update();
+                return promise;
+            }
+            update() {
+                let output = '';
+                let complete = 0;
+                for (let i = 0, n = this.queue.length; i < n; i++) {
+                    let { from, to, start, end, char } = this.queue[i];
+                    if (this.frame >= end) { complete++; output += to; } 
+                    else if (this.frame >= start) {
+                        if (!char || Math.random() < 0.28) { char = this.randomChar(); this.queue[i].char = char; }
+                        output += `<span class="dud">${char}</span>`;
+                    } else { output += from; }
+                }
+                this.el.innerHTML = output;
+                if (complete === this.queue.length) { this.resolve(); } 
+                else { this.frameRequest = requestAnimationFrame(this.update); this.frame++; }
+            }
+            randomChar() { return this.chars[Math.floor(Math.random() * this.chars.length)]; }
         }
 
-        function startTyping(phrases) {
-            clearTimeout(typingInterval);
-            phraseIndex = 0;
-            charIndex = 0;
-            isDeleting = false;
-            typedTextSpan.textContent = ''; 
-            typeWriterEffect(phrases);
-        }
+        const phrases = [ "Orbis ti sta aspettando.", "L'ombra di Varyn si avvicina.", "Ogni blocco racconta una storia.", "Preparati a varcare il portale.", "L'avventura di una vita sta per iniziare." ];
+        const el = document.getElementById('scramble-text');
+        const fx = new TextScramble(el);
+        let counter = 0; let scrambleLoopActive = true;
+        const nextPhrase = () => {
+            if (!scrambleLoopActive) return;
+            fx.setText(phrases[counter]).then(() => { setTimeout(nextPhrase, 3000); });
+            counter = (counter + 1) % phrases.length;
+        };
+        nextPhrase();
+
+        // --- TIMER & FIREWORKS LOGIC ---
+        const targetDate = new Date('2026-01-13T15:00:00Z'); 
+        
+        let activeTarget = targetDate;
+        const CRITICAL_THRESHOLD_MS = 60 * 60 * 1000;
+        const DAY_24_THRESHOLD_MS = 24 * 60 * 60 * 1000;
+        const WEEK_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000;
+
+        let lastPhase = '';
+        let debugClass = '';
+        let isFireworksActive = false;
+
+        const container = document.getElementById('main-container');
+        const flashOverlay = document.getElementById('flash-overlay');
+
+        let colors = ['252, 209, 91', '230, 230, 230', '24, 34, 49', '255, 255, 255'];
+        const fireworkColors = ['255, 0, 0', '0, 255, 0', '0, 0, 255', '255, 255, 0', '255, 0, 255', '0, 255, 255', '255, 165, 0'];
 
         function applyDebugClass(className) {
-            document.body.classList.remove('critical', 'aura-19', 'aura-18', 'aura-17', 'aura-16');
+            document.body.classList.remove('critical', 'aura-19', 'aura-18', 'phase-24h', 'phase-week');
             if (className) document.body.classList.add(className);
-            
-            if (className === 'critical') {
-                 colors[0] = '255, 170, 0'; 
-                 colors[1] = '255, 0, 0';   
-            } else {
-                 resetColors();
-            }
+            updateColorsForPhase(className);
             debugClass = className;
         }
 
-        function resetColors() {
-             colors[0] = '0, 229, 255'; 
-             colors[1] = '138, 43, 226';
+        function updateColorsForPhase(phase) {
+            if (phase === 'aura-19') { colors = ['0, 229, 255', '255, 255, 255', '200, 250, 255', '0, 150, 255']; } 
+            else if (phase === 'aura-18') { colors = ['255, 0, 255', '138, 43, 226', '0, 255, 255', '255, 255, 255']; } 
+            else if (phase === 'critical') { colors = ['255, 0, 0', '255, 165, 0', '100, 0, 0', '255, 255, 0']; } 
+            else if (phase === 'phase-24h') { colors = ['255, 174, 0', '255, 220, 100', '100, 50, 0', '255, 255, 255']; }
+            else if (phase === 'phase-week') { colors = ['46, 255, 80', '150, 255, 170', '10, 50, 20', '255, 255, 255']; }
+            else { colors = ['252, 209, 91', '230, 230, 230', '24, 34, 49', '255, 255, 255']; }
         }
 
-        function skipPhase() {
-            activeTarget = new Date(new Date().getTime() + 2000); 
-        }
+        function skipPhase() { activeTarget = new Date(new Date().getTime() + 1000); }
         
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'd') {
@@ -453,281 +329,176 @@ const phrasesPhase2 = [
             }
         });
 
-        function applySparkle(element) {
-            element.classList.add('sparkle');
-            setTimeout(() => { element.classList.remove('sparkle'); }, 500); 
-        }
-
-        function switchPhase() {
-            isTransitioning = true;
-            container.classList.add('fading-out');
-            clearTimeout(typingInterval); // Ferma l'effetto macchina da scrivere
+        function triggerFireworksMode() {
+            if(isFireworksActive) return;
+            isFireworksActive = true;
+            scrambleLoopActive = false;
+            flashOverlay.style.opacity = '1';
+            setTimeout(() => { flashOverlay.style.opacity = '0'; }, 100);
+            particles = []; 
+            container.style.opacity = '0';
+            container.style.transform = 'scale(0.8)';
+            document.body.className = ''; 
+            updateColorsForPhase(''); 
 
             setTimeout(() => {
-                // CAMBIO FASE E TESTI
-                currentPhase = 2;
-                activeTarget = targetDate2;
-                isCritical = false;
-                
-                document.body.classList.remove('critical', 'aura-19', 'aura-18', 'aura-17', 'aura-16');
-                resetColors();
-
-                document.getElementById('main-title').innerText = "PREPARATI AL LANCIO";
-                document.getElementById('date-info').innerText = "Rilascio Early Access: 13 Gennaio 2026, 16:00 CET";
-                
-                // Riavvia il typing effect con le frasi della Fase 2
-                startTyping(phrasesPhase2); 
-                
-                updateTimerNumsOnly();
-
-                container.classList.remove('fading-out');
-                isTransitioning = false;
-
-            }, 2000); 
+                container.innerHTML = `
+                    <img src="https://hytale.com/static/images/logo.png" style="width:450px; margin-bottom: 20px; filter: drop-shadow(0 0 25px rgba(252, 209, 91, 0.8));">
+                    <h1 style="color: #FCD15B; font-size: 4.5rem; text-shadow: 0 0 30px #FCD15B;">EARLY ACCESS DISPONIBILE</h1>
+                    <p class="subtitle" style="color: #fff; font-size: 1.5rem; letter-spacing: 2px;">BENVENUTO SU ORBIS. IL PORTALE È APERTO.</p>
+                `;
+                container.style.opacity = '1';
+                container.style.transform = 'scale(1)';
+            }, 1500);
         }
 
-        function updateTimerNumsOnly() {
-             const current = new Date().getTime();
-             let diff = activeTarget - current;
-             if (diff < 0) diff = 0;
-             
-             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-             const s = Math.floor((diff % (1000 * 60)) / 1000);
-             
-             if (d > 0) {
-                 boxDays.style.display = "block";
-                 document.getElementById("days").innerText = d < 10 ? "0" + d : d;
-             } else {
-                 boxDays.style.display = "none";
-             }
-
-             document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
-             document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
-             document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
+        function launchFirework() {
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * (window.innerHeight / 2) + 50; 
+            const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+            for(let i=0; i<60; i++) { particles.push(new Particle(true, startX, startY, color)); }
         }
 
         function updateTimer() {
-            if (isTransitioning) return;
-
+            if(isFireworksActive) return;
             const current = new Date().getTime();
             const diff = activeTarget - current;
             
-            if (diff <= 0) {
-                 if (currentPhase === 1) {
-                     switchPhase();
-                     return;
-                 } else {
-                     // FASE 2 COMPLETATA (Early Access)
-                     clearTimeout(typingInterval);
-                     document.getElementById("days").innerText = "00";
-                     document.getElementById("hours").innerText = "00";
-                     document.getElementById("minutes").innerText = "00";
-                     document.getElementById("seconds").innerText = "00";
-                     document.body.classList.remove('critical', 'aura-19', 'aura-18', 'aura-17', 'aura-16');
-                     
-                     container.innerHTML = `
-                            <img id="hytale-logo" src="https://hytale.com/static/images/logo.png" alt="Hytale Logo" style="width:300px; margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.7)); animation: fadeIn 2s ease-out forwards, float 4s ease-in-out infinite alternate;">
-                            <h1 style="text-shadow: 0 0 20px rgba(79, 255, 168, 1); border-color: #4fffa8; color: #4fffa8;">EARLY ACCESS DISPONIBILE</h1>
-                            <p class="subtitle">Benvenuto su Orbis. Il portale è aperto.</p>
-                        `;
-                     return;
-                 }
-            }
+            if (diff <= 0) { triggerFireworksMode(); return; }
 
             const totalHoursRemaining = Math.ceil(diff / (1000 * 60 * 60));
-
-            // Logica Visuale (Aure e Critico)
+            
             if (!debugClass) {
-                if (totalHoursRemaining !== lastHoursRemaining) {
-                    document.body.classList.remove('aura-19', 'aura-18', 'aura-17', 'aura-16');
-                    if (totalHoursRemaining <= 19) { document.body.classList.add('aura-19'); }
-                    if (totalHoursRemaining <= 18) { document.body.classList.add('aura-18'); }
-                    if (totalHoursRemaining <= 17) { document.body.classList.add('aura-17'); }
-                    if (totalHoursRemaining <= 16) { document.body.classList.add('aura-16'); }
-                    lastHoursRemaining = totalHoursRemaining;
-                }
-                
-                if (diff <= CRITICAL_THRESHOLD_MS && !isCritical) {
-                    isCritical = true;
-                    document.body.classList.add('critical');
-                    document.body.classList.remove('aura-19', 'aura-18', 'aura-17', 'aura-16'); 
-                    colors[0] = '255, 170, 0'; 
-                    colors[1] = '255, 0, 0';   
-                } else if (diff > CRITICAL_THRESHOLD_MS && isCritical) {
-                    isCritical = false;
-                    document.body.classList.remove('critical');
-                    resetColors();
+                let currentPhaseDetected = '';
+                if (diff <= CRITICAL_THRESHOLD_MS) currentPhaseDetected = 'critical';
+                else if (totalHoursRemaining === 19) currentPhaseDetected = 'aura-19';
+                else if (totalHoursRemaining === 18) currentPhaseDetected = 'aura-18';
+                else if (diff <= DAY_24_THRESHOLD_MS) currentPhaseDetected = 'phase-24h';
+                else if (diff <= WEEK_THRESHOLD_MS) currentPhaseDetected = 'phase-week';
+
+                if (currentPhaseDetected !== lastPhase) {
+                    document.body.classList.remove('critical', 'aura-19', 'aura-18', 'phase-24h', 'phase-week');
+                    if (currentPhaseDetected) document.body.classList.add(currentPhaseDetected);
+                    updateColorsForPhase(currentPhaseDetected);
+                    lastPhase = currentPhaseDetected;
                 }
             }
 
-            // Calcolo Tempo
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-            // LOGICA VISIBILITÀ GIORNI
-            if (d > 0) {
-                boxDays.style.display = "block";
-            } else {
-                boxDays.style.display = "none";
-            }
-
-            // Sparkle
-            if (s !== lastSeconds) { applySparkle(boxSeconds); lastSeconds = s; }
-            if (m !== lastMinutes) { applySparkle(boxMinutes); lastMinutes = m; }
-            if (h !== lastHours) { applySparkle(boxHours); lastHours = h; }
-            if (d !== lastDays) { applySparkle(boxDays); lastDays = d; }
-
-            document.getElementById("days").innerText = d < 10 ? "0" + d : d;
-            document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
-            document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
-            document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
+            
+            if(document.getElementById("box-days")) { if (d > 0) document.getElementById("box-days").style.display = "block"; else document.getElementById("box-days").style.display = "none"; }
+            if(document.getElementById("days")) document.getElementById("days").innerText = d < 10 ? "0" + d : d;
+            if(document.getElementById("hours")) document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
+            if(document.getElementById("minutes")) document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
+            if(document.getElementById("seconds")) document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
         }
 
         setInterval(updateTimer, 1000);
         updateTimer();
 
-        // --- INIZIALIZZAZIONE EFFETTO MACCHINA DA SCRIVERE ---
-        startTyping(phrasesPhase1);
-
-        // --- 2. MAGIC PARTICLES SYSTEM (Invariato) ---
+        // --- PARTICLES ENGINE ---
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
-        
         let width, height;
         let particles = [];
 
-        const colors = [
-            '0, 229, 255',   
-            '138, 43, 226',  
-            '79, 255, 168',  
-            '255, 255, 255'  
-        ];
-
-        function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-        }
-        window.addEventListener('resize', resize);
-        resize();
+        function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+        window.addEventListener('resize', resize); resize();
 
         class Particle {
-            constructor() {
-                this.reset();
+            constructor(isFirework = false, startX = 0, startY = 0, colorOverride = null) { 
+                this.isFirework = isFirework;
+                this.startX = startX;
+                this.startY = startY;
+                this.colorOverride = colorOverride;
+                this.reset(); 
             }
-
+            
             reset() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.size = Math.random() * 2 + 1; 
-                this.speedX = Math.random() * 1 - 0.5;
-                this.speedY = Math.random() * 1 - 0.5;
-                this.life = Math.random() * 100 + 50; 
-                this.opacity = Math.random() * 0.5 + 0.2;
-                this.colorIndex = Math.floor(Math.random() * colors.length);
-                
-                this.isOrb = Math.random() < 0.1; 
-                if (this.isOrb) {
-                    this.size = Math.random() * 4 + 2;
-                    this.speedY = -Math.random() * 1.5;
-                    this.opacity = 0.8;
-                }
-            }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.life--;
-
-                if (this.life < 20) {
-                    this.opacity -= 0.02;
-                }
-
-                if (this.life <= 0 || this.opacity <= 0 || 
-                    this.x < -10 || this.x > width + 10 || 
-                    this.y < -10 || this.y > height + 10) {
-                    this.reset();
-                }
-            }
-
-            draw() {
-                const currentColor = colors[this.colorIndex];
-
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${currentColor}, ${this.opacity})`;
-                
-                if (this.isOrb) {
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = `rgba(${currentColor}, 0.8)`;
+                if (this.isFirework) {
+                    this.x = this.startX;
+                    this.y = this.startY;
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = Math.random() * 6 + 2; 
+                    this.speedX = Math.cos(angle) * velocity;
+                    this.speedY = Math.sin(angle) * velocity;
+                    this.size = Math.random() * 3 + 1;
+                    this.life = Math.random() * 50 + 40;
+                    this.opacity = 1;
+                    this.friction = 0.96; 
+                    this.gravity = 0.15;   
                 } else {
-                    ctx.shadowBlur = 0;
+                    this.x = Math.random() * width; this.y = Math.random() * height;
+                    this.size = Math.random() * 2 + 1; 
+                    this.speedX = Math.random() * 1 - 0.5; this.speedY = Math.random() * 1 - 0.5;
+                    this.life = Math.random() * 100 + 50; this.opacity = Math.random() * 0.5 + 0.2;
+                    if (document.body.classList.contains('critical')) { this.speedX *= 3; this.speedY *= 3; }
                 }
-                
+                this.colorIndex = Math.floor(Math.random() * colors.length);
+                this.isOrb = Math.random() < 0.1; 
+                if (this.isOrb && !this.isFirework) { this.size = Math.random() * 4 + 2; this.speedY = -Math.random() * 1.5; this.opacity = 0.8; }
+            }
+            
+            update() {
+                if (this.isFirework) {
+                    this.speedX *= this.friction; this.speedY *= this.friction; this.speedY += this.gravity;
+                    this.x += this.speedX; this.y += this.speedY; this.life--; this.opacity -= 0.01;
+                } else {
+                    this.x += this.speedX; this.y += this.speedY; this.life--;
+                    if (this.life < 20) this.opacity -= 0.02;
+                    if (this.life <= 0 || this.opacity <= 0 || this.x < -10 || this.x > width + 10) this.reset();
+                }
+            }
+            
+            draw() {
+                if (this.opacity <= 0) return;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                let fillStyle;
+                if(this.isFirework && this.colorOverride) {
+                    fillStyle = `rgba(${this.hexToRgb(this.colorOverride)}, ${this.opacity})`;
+                } else {
+                    const col = colors[this.colorIndex % colors.length]; 
+                    fillStyle = `rgba(${col}, ${this.opacity})`;
+                }
+                ctx.fillStyle = fillStyle;
+                if (this.isOrb || this.isFirework) { ctx.shadowBlur = 8; ctx.shadowColor = fillStyle; }
                 ctx.fill();
             }
-        }
 
-        function init() {
-            particles = [];
-            for (let i = 0; i < 150; i++) {
-                particles.push(new Particle());
+            hexToRgb(hex) {
+                 if(hex.includes(',')) return hex;
+                 return '255, 255, 255'; 
             }
         }
 
+        function init() { particles = []; for (let i = 0; i < 150; i++) particles.push(new Particle()); }
         function animate() {
             ctx.clearRect(0, 0, width, height);
+            if (isFireworksActive && Math.random() < 0.05) { launchFirework(); }
             
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
+            if(isFireworksActive) {
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update(); particles[i].draw();
+                    if (particles[i].life <= 0 || particles[i].opacity <= 0) { particles.splice(i, 1); }
+                }
+            } else {
+                for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); }
             }
-            
             requestAnimationFrame(animate);
         }
-
-        window.addEventListener('mousemove', (e) => {
-            if (particles.length > 200) return;
-            for(let k=0; k<2; k++){
-                const p = new Particle();
-                p.x = e.clientX;
-                p.y = e.clientY;
-                p.size = Math.random() * 3;
-                p.speedX = (Math.random() - 0.5) * 4;
-                p.speedY = (Math.random() - 0.5) * 4;
-                p.life = 30;
-                p.colorIndex = 0;
-                p.isOrb = true;
-                particles.push(p);
-                if(particles.length > 200) particles.shift();
-            }
-        });
-
-        // --- 3. LOGICA PARALLASSE ---
+        
         const bgImg = document.getElementById('bg-img-placeholder');
         const bgGradient = document.getElementById('bg-gradient');
-        
         window.addEventListener('mousemove', (e) => {
-            const mouseX = e.clientX - width / 2;
-            const mouseY = e.clientY - height / 2;
-            const factorNear = 0.005; 
-            const factorFar = 0.002; 
-            const moveXNear = mouseX * factorNear;
-            const moveYNear = mouseY * factorNear;
-            const moveXFar = mouseX * factorFar;
-            const moveYFar = mouseY * factorFar;
-
-            bgImg.style.transform = `translate(${moveXFar}px, ${moveYFar}px)`;
-            bgGradient.style.transform = `translate(${moveXNear}px, ${moveYNear}px)`;
+            const mouseX = e.clientX - width / 2; const mouseY = e.clientY - height / 2;
+            bgImg.style.transform = `translate(${mouseX * 0.002}px, ${mouseY * 0.002}px)`;
+            bgGradient.style.transform = `translate(${mouseX * 0.005}px, ${mouseY * 0.005}px)`;
         });
 
-        init();
-        animate();
+        init(); animate();
     </script>
 </body>
 </html>
