@@ -2,264 +2,267 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hytale Countdown - Early Access</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hytale Countdown - Hytale Colors</title>
     
     <link href="https://fonts.cdnfonts.com/css/friz-quadrata-std" rel="stylesheet">
 
     <style>
-        /* --- STILI BASE --- */
+        /* --- CORE STYLES --- */
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #050508;
-            overflow: hidden;
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #050508; overflow: hidden;
             font-family: 'Friz Quadrata Std', serif; 
-            transition: background-color 2s ease-in-out;
-            perspective: 1000px;
+            transition: background-color 1s ease;
         }
 
-        /* OVERLAY VARI */
-        #flash-overlay {
+        /* --- VIDEO BACKGROUND --- */
+        #video-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: white; opacity: 0; pointer-events: none; z-index: 100;
-            transition: opacity 1.5s ease-out;
+            object-fit: cover; z-index: 0; 
+            opacity: 0; transition: opacity 1s ease-in-out;
+            pointer-events: none;
         }
 
+        /* --- LAYERS --- */
         .vignette-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 20;
-            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.8) 100%);
-            opacity: 0.5; transition: box-shadow 0.5s, opacity 0.5s;
+            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.85) 100%);
         }
 
         .bg-img-placeholder {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('https://cdn.hytale.com/5c17d2165a250300122a1670_hytale_logo_hero.jpg');
             background-size: cover; background-position: center;
-            filter: blur(5px); opacity: 0.2; z-index: 1;
-            transition: opacity 2s ease-in-out, transform 5s ease-in-out;
+            filter: blur(8px); opacity: 0.15; z-index: 1;
+            transition: opacity 1s;
         }
         
         .bg-gradient {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, rgba(30, 40, 60, 0.9) 0%, rgba(5, 5, 8, 0.98) 100%);
-            z-index: 2; transition: background 2s ease-in-out;
+            background: radial-gradient(circle at center, rgba(30, 45, 70, 0.8) 0%, rgba(5, 5, 8, 1) 100%);
+            z-index: 2; transition: opacity 1.5s;
         }
 
-        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 5; pointer-events: none; }
+        canvas { 
+            display: block; position: absolute; top: 0; left: 0; z-index: 5; 
+            pointer-events: none; transition: opacity 1s; 
+        }
 
+        /* --- CONTENT --- */
         .container {
             position: relative; z-index: 10; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; height: 100vh;
-            text-align: center; color: #ffffff;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            justify-content: center; align-items: center; width: 100%; height: 100vh;
+            text-align: center; color: #ffffff; padding: 10px; box-sizing: border-box;
+            transition: opacity 1s, transform 1s;
         }
 
         #hytale-logo {
-            width: 380px; height: auto; margin-bottom: 25px;
+            width: 250px; height: auto; margin-bottom: 10px;
             filter: drop-shadow(0 0 15px rgba(252, 209, 91, 0.4)); 
-            transition: filter 0.5s, transform 0.1s;
-            animation: float 4s ease-in-out infinite alternate;
+            animation: float 5s ease-in-out infinite alternate;
         }
-        
         @keyframes float { 0% { transform: translateY(0px); } 100% { transform: translateY(-10px); } }
 
         h1 {
-            font-size: 3.8rem; text-transform: uppercase; letter-spacing: 1px;
-            color: #FCD15B; margin-bottom: 15px;
+            font-size: 2.2rem; text-transform: uppercase; letter-spacing: 2px;
+            color: #FCD15B; margin: 0 0 5px 0;
             text-shadow: 0 0 15px rgba(252, 209, 91, 0.4); 
-            border-bottom: 2px solid #FCD15B; padding-bottom: 15px;
-            display: inline-block; font-weight: 700;
-            transition: all 0.5s ease; position: relative;
+            border-bottom: 2px solid #FCD15B; padding-bottom: 5px;
+            transition: color 0.5s, text-shadow 0.5s, border-color 0.5s;
         }
         
-        /* --- STILE SOTTOTITOLO AGGIORNATO (MAIUSCOLO) --- */
-        p.subtitle {
-            font-size: 1.4rem; 
-            color: #E6E6E6; 
-            margin-bottom: 20px;
-            letter-spacing: 2px; /* Spaziatura aumentata per leggibilità in maiuscolo */
-            min-height: 1.4em; 
-            font-weight: 400;
-            text-transform: uppercase; /* Rende tutto MAIUSCOLO */
+        .subtitle {
+            font-size: 1.1rem; color: #E6E6E6; margin-bottom: 20px;
+            letter-spacing: 2px; min-height: 1.4em; text-transform: uppercase;
         }
+        .dud { color: #FCD15B; opacity: 0.5; }
 
-        .dud { color: #a8905e; opacity: 0.6; }
-
-        p.timezone-info {
-            font-size: 0.9rem; color: #E6E6E6; margin-bottom: 50px;
-            font-weight: 400; font-style: italic; opacity: 0.8;
-        }
-
-        /* --- STILE DISCLAIMER LEGALE --- */
-        .legal-disclaimer {
-            margin-top: 40px;
-            font-size: 0.75rem;
-            color: #888;
-            opacity: 0.7;
-            line-height: 1.6;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .timer-wrapper { display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; }
-
+        /* --- TIMER --- */
+        .timer-wrapper { display: flex; gap: 20px; justify-content: center; margin-bottom: 25px; }
         .time-box {
             background-color: rgba(24, 34, 49, 0.9);
-            border: 2px solid #6d5840; 
-            padding: 25px; min-width: 110px; border-radius: 6px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.6);
-            position: relative;
-            transition: border-color 1s, box-shadow 1s, background-color 1s;
+            border: 2px solid #6d5840; padding: 15px 25px; min-width: 100px; border-radius: 8px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.6); transition: all 0.5s;
+        }
+        .number { 
+            display: block; font-size: 3.8rem; font-weight: 700; color: #FCD15B; 
+            text-shadow: 0 0 20px rgba(252, 209, 91, 0.4); line-height: 1; margin-bottom: 5px; transition: color 0.5s; 
+        }
+        .label { font-size: 0.9rem; text-transform: uppercase; color: #E6E6E6; font-weight: 700; opacity: 0.9; }
+
+        /* --- COUNTUP --- */
+        .countup-section {
+            padding: 15px 25px; background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(252, 209, 91, 0.15); border-radius: 10px;
+            transition: opacity 0.5s; max-width: 90vw;
+        }
+        .countup-title { font-size: 0.9rem; color: #FCD15B; letter-spacing: 3px; margin-bottom: 12px; font-weight: 700; opacity: 0.9; transition: color 0.5s; }
+        .countup-wrapper { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .countup-box { 
+            background-color: rgba(24, 34, 49, 0.9); border: 2px solid #6d5840;              
+            padding: 10px 15px; min-width: 75px; border-radius: 6px; box-shadow: 0 0 15px rgba(0,0,0,0.4);
+            transition: border-color 0.5s, box-shadow 0.5s;
+        }
+        .countup-number { 
+            display: block; font-size: 2rem; font-weight: 700; color: #FCD15B;
+            text-shadow: 0 0 10px rgba(252, 209, 91, 0.3); line-height: 1; transition: color 0.5s;
+        }
+        .countup-label { font-size: 0.7rem; text-transform: uppercase; color: #E6E6E6; font-weight: 700; margin-top: 4px; display: block; }
+
+        .legal-disclaimer { 
+            position: absolute; bottom: 10px; font-size: 0.65rem; color: #777; 
+            text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; opacity: 0.8;
         }
 
-        .number {
-            display: block; font-size: 4.2rem; font-weight: 700; 
-            color: #FCD15B; text-shadow: 0 0 15px rgba(252, 209, 91, 0.3); 
-            transition: color 1s, text-shadow 1s;
-        }
-        
-        .label {
-            font-size: 1rem; text-transform: uppercase; color: #E6E6E6;
-            margin-top: 5px; display: block; letter-spacing: 1px; font-weight: 700;
-        }
-
-        /* STILI FASI */
+        /* --- FASI CLASSICHE --- */
         body.phase-week .bg-gradient { background: radial-gradient(circle at center, rgba(10, 40, 20, 0.9) 0%, rgba(2, 15, 5, 0.98) 100%); }
-        body.phase-week h1 { color: #5eff80; border-color: #5eff80; text-shadow: 0 0 20px rgba(0, 255, 100, 0.6); }
-        body.phase-week .time-box { border-color: #2eff50; box-shadow: 0 0 20px rgba(46, 255, 80, 0.2); }
-        body.phase-week .number { color: #ccffda; text-shadow: 0 0 15px #00ff55; }
+        body.phase-week h1, body.phase-week .countup-title { color: #5eff80; border-color: #5eff80; text-shadow: 0 0 25px #00ff64; }
+        body.phase-week .time-box, body.phase-week .countup-box { border-color: #2eff50; box-shadow: 0 0 20px rgba(46, 255, 80, 0.2); }
+        body.phase-week .number, body.phase-week .countup-number { color: #ccffda; }
 
         body.phase-24h .bg-gradient { background: radial-gradient(circle at center, rgba(60, 30, 10, 0.9) 0%, rgba(20, 5, 0, 0.98) 100%); }
-        body.phase-24h h1 { color: #ffae00; border-color: #ffae00; text-shadow: 0 0 25px rgba(255, 140, 0, 0.8); }
-        body.phase-24h .time-box { border-color: #ffae00; box-shadow: 0 0 25px rgba(255, 174, 0, 0.3); }
-        body.phase-24h .number { color: #fffbd0; text-shadow: 0 0 20px #ffae00; }
+        body.phase-24h h1, body.phase-24h .countup-title { color: #ffae00; border-color: #ffae00; text-shadow: 0 0 30px #ff8c00; }
+        body.phase-24h .time-box, body.phase-24h .countup-box { border-color: #ffae00; box-shadow: 0 0 25px rgba(255, 174, 0, 0.3); }
+        body.phase-24h .number, body.phase-24h .countup-number { color: #fffbd0; }
 
-        body.aura-19 .bg-gradient { background: radial-gradient(circle at center, rgba(20, 40, 60, 0.9) 0%, rgba(2, 10, 20, 0.98) 100%); }
-        body.aura-19 h1 { color: #a0eaff; border-color: #a0eaff; text-shadow: 0 0 20px rgba(0, 229, 255, 0.8); animation: pulseText 3s infinite ease-in-out; }
-        body.aura-19 .time-box { border-color: #00e5ff; box-shadow: 0 0 25px rgba(0, 229, 255, 0.3); }
-        body.aura-19 .number { color: #e0fbff; text-shadow: 0 0 15px #00e5ff; }
-
-        body.aura-18 .bg-gradient { background: radial-gradient(circle at center, rgba(40, 20, 60, 0.9) 0%, rgba(10, 2, 20, 0.98) 100%); }
-        body.aura-18 h1 { color: #d8a0ff; border-color: #d8a0ff; text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff; animation: glitchSkew 2s infinite linear alternate-reverse; }
-        body.aura-18 .time-box { border-color: #be5eff; box-shadow: 0 0 20px rgba(190, 94, 255, 0.4); }
-        body.aura-18 .number { color: #f0d0ff; text-shadow: 2px 0 #ff00de, -2px 0 #00ffff; }
-
-        body.critical .vignette-overlay { box-shadow: inset 0 0 150px rgba(255, 0, 0, 0.6); background: radial-gradient(circle, transparent 40%, rgba(50, 0, 0, 0.9) 100%); animation: redAlert 1s infinite alternate; }
-        body.critical .bg-gradient { background: radial-gradient(circle at center, rgba(60, 10, 10, 0.9) 0%, rgba(0, 0, 0, 1) 100%); }
-        body.critical h1 { color: #ff3333; border-color: #ff3333; text-shadow: 0 0 30px #ff0000; animation: criticalShake 0.4s infinite; }
-        body.critical .time-box { background-color: rgba(40, 10, 10, 0.9); border-color: #ff3333; box-shadow: 0 0 40px rgba(255, 0, 0, 0.5); animation: boxPulse 0.5s infinite alternate; }
-        body.critical .number { color: #ffaa00; text-shadow: 0 0 20px #ff3333; }
-
-        @keyframes pulseText { 0% { text-shadow: 0 0 20px rgba(0, 229, 255, 0.6); transform: scale(1); } 50% { text-shadow: 0 0 40px rgba(0, 229, 255, 1); transform: scale(1.02); } 100% { transform: scale(1); } }
-        @keyframes glitchSkew { 0%, 100% { transform: skew(0deg); } 20% { transform: skew(-2deg); } 80% { transform: skew(2deg); } }
-        @keyframes criticalShake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, -1px); } }
-        @keyframes redAlert { 0% { opacity: 0.5; } 100% { opacity: 1; } }
-        @keyframes boxPulse { 0% { border-color: #ff3333; } 100% { border-color: #ffaa00; } }
-
-        /* DEBUG CONTROLS */
-        #debug-controls { position: fixed; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 5px; color: white; z-index: 100; font-size: 12px; display: none; }
-        
-        @media (max-width: 768px) {
-            #hytale-logo { width: 220px; margin-bottom: 20px;}
-            h1 { font-size: 2rem; }
-            .timer-wrapper { gap: 15px; }
-            .time-box { min-width: 70px; padding: 15px; }
-            .number { font-size: 2.5rem; }
+        /* NEON CYCLE (12 Ore -> 1 Ora) */
+        @keyframes neonCycle {
+            0% { color: #ff00ff; border-color: #ff00ff; text-shadow: 0 0 25px #ff00ff; box-shadow: 0 0 20px rgba(255,0,255,0.4); }
+            25% { color: #00ffff; border-color: #00ffff; text-shadow: 0 0 25px #00ffff; box-shadow: 0 0 20px rgba(0,255,255,0.4); }
+            50% { color: #00ff00; border-color: #00ff00; text-shadow: 0 0 25px #00ff00; box-shadow: 0 0 20px rgba(0,255,0,0.4); }
+            75% { color: #ffff00; border-color: #ffff00; text-shadow: 0 0 25px #ffff00; box-shadow: 0 0 20px rgba(255,255,0,0.4); }
+            100% { color: #ff0000; border-color: #ff0000; text-shadow: 0 0 25px #ff0000; box-shadow: 0 0 20px rgba(255,0,0,0.4); }
         }
+
+        /* --- FASE VIDEO (-1 ORA & 10 SEC) --- */
+        body.phase-video #video-bg { opacity: 1 !important; } 
+        body.phase-video .bg-img-placeholder { opacity: 0 !important; } 
+        body.phase-video .bg-gradient { opacity: 0.2 !important; }
+        body.phase-video canvas { opacity: 0; } 
+        body.phase-video .countup-section { display: none !important; } /* Nasconde Timer 2 */
+        
+        /* HYTALE COLORS OVER VIDEO */
+        body.phase-video .time-box { 
+            background-color: rgba(24, 34, 49, 0.85); /* Blu scuro Hytale */
+            border-color: #FCD15B; /* Oro Hytale */
+            box-shadow: 0 0 30px rgba(252, 209, 91, 0.3); 
+            animation: none; 
+        }
+        body.phase-video h1 { 
+            color: #FCD15B; /* Oro Hytale */
+            text-shadow: 0 0 20px rgba(252, 209, 91, 0.6); 
+            border-bottom-color: #FCD15B;
+            animation: none; 
+        }
+        body.phase-video .number { 
+            color: #FCD15B; /* Oro Hytale */
+            text-shadow: 0 0 20px rgba(252, 209, 91, 0.5); 
+            animation: none; 
+        }
+        body.phase-video .label {
+            color: #E6E6E6; /* Grigio chiaro per contrasto */
+        }
+
+        /* --- FASE FUOCHI (0 SEC) --- */
+        body.phase-fireworks #video-bg { opacity: 1; }
+        body.phase-fireworks .countup-section { display: none !important; }
+        body.phase-fireworks canvas { opacity: 1; } 
+        body.phase-fireworks .bg-img-placeholder { opacity: 0; }
+        body.phase-fireworks .bg-gradient { opacity: 0.2; }
+
+        /* --- DEBUG MENU --- */
+        #debug-controls { 
+            position: fixed; top: 20px; right: 20px; 
+            background: rgba(0, 0, 0, 0.9); border: 1px solid #444;
+            padding: 15px; border-radius: 8px; color: white; z-index: 9999; 
+            font-size: 13px; display: none; box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
+        #debug-controls select { background: #222; color: #fff; border: 1px solid #555; padding: 5px; margin-top: 5px; width: 100%; }
+        #debug-controls button {
+            background:#444; color:#fff; border:1px solid #666; width:100%; cursor:pointer; 
+            padding: 8px; margin-top: 8px; font-weight: bold; border-radius: 4px;
+        }
+        #debug-controls button:hover { background: #555; }
     </style>
 </head>
 <body>
 
-    <div id="flash-overlay"></div>
+    <video id="video-bg" loop muted playsinline>
+        <source src="storm.mp4" type="video/mp4">
+    </video>
+
     <div class="vignette-overlay"></div>
-    <div class="bg-img-placeholder" id="bg-img-placeholder"></div>
-    <div class="bg-gradient" id="bg-gradient"></div>
+    <div class="bg-img-placeholder"></div>
+    <div class="bg-gradient"></div>
     <canvas id="canvas"></canvas>
 
     <div class="container" id="main-container">
         <img id="hytale-logo" src="https://hytale.com/static/images/logo.png" alt="Hytale Logo">
-        
         <h1 id="main-title">PREPARATI AL LANCIO</h1>
-        
         <p class="subtitle" id="scramble-text"></p>
-
-        <p class="timezone-info" id="date-info">Rilascio Early Access: 13 Gennaio 2026, 16:00 CET</p>
         
         <div class="timer-wrapper">
-            <div class="time-box" id="box-days">
-                <span class="number" id="days">00</span>
-                <span class="label">Giorni</span>
-            </div>
+            <div class="time-box"><span class="number" id="days">00</span><span class="label">Giorni</span></div>
+            <div class="time-box"><span class="number" id="hours">00</span><span class="label">Ore</span></div>
+            <div class="time-box"><span class="number" id="minutes">00</span><span class="label">Minuti</span></div>
+            <div class="time-box"><span class="number" id="seconds">00</span><span class="label">Secondi</span></div>
+        </div>
 
-            <div class="time-box" id="box-hours">
-                <span class="number" id="hours">00</span>
-                <span class="label">Ore</span>
-            </div>
-            <div class="time-box" id="box-minutes">
-                <span class="number" id="minutes">00</span>
-                <span class="label">Minuti</span>
-            </div>
-            <div class="time-box" id="box-seconds">
-                <span class="number" id="seconds">00</span>
-                <span class="label">Secondi</span>
+        <div class="countup-section" id="secondary-timer">
+            <div class="countup-title">TEMPO DALL'ANNUNCIO DEL GIOCO</div>
+            <div class="countup-wrapper">
+                <div class="countup-box"><span class="countup-number" id="up-years">0</span><span class="countup-label">Anni</span></div>
+                <div class="countup-box"><span class="countup-number" id="up-months">0</span><span class="countup-label">Mesi</span></div>
+                <div class="countup-box"><span class="countup-number" id="up-days">0</span><span class="countup-label">Giorni</span></div>
+                <div class="countup-box"><span class="countup-number" id="up-hours">00</span><span class="countup-label">Ore</span></div>
+                <div class="countup-box"><span class="countup-number" id="up-minutes">00</span><span class="countup-label">Min</span></div>
+                <div class="countup-box"><span class="countup-number" id="up-seconds">00</span><span class="countup-label">Sec</span></div>
             </div>
         </div>
-        
+
         <div class="legal-disclaimer">
-            This site is not affiliated with Hytale or Hypixel Studios<br>
+            This site is not affiliated with Hytale or Hypixel Studios.<br>
             Some media are trademarked property of Hypixel Studios!
         </div>
     </div>
-    
+
     <div id="debug-controls">
-        <strong>DEBUG (Ctrl+D)</strong>
-        <label>Forza Fase:</label>
-        <select id="debug-class-selector" onchange="applyDebugClass(this.value)">
-            <option value="">-- Normale (Oro) --</option>
-            <option value="phase-week">1 Settimana (Verde)</option>
-            <option value="phase-24h">24 Ore (Arancio)</option>
-            <option value="aura-19">Aura 19h (Blu)</option>
-            <option value="aura-18">Aura 18h (Viola)</option>
-            <option value="critical">Critico 1h (Rosso)</option>
+        <div style="margin-bottom:5px; border-bottom:1px solid #555; padding-bottom:5px; font-weight:bold;">MODALITÀ DEBUG</div>
+        <label>Visualizza Fase:</label>
+        <select onchange="applyDebug(this.value)" id="debug-selector">
+            <option value="">Default (Oro)</option>
+            <option value="phase-week">-1 Settimana</option>
+            <option value="phase-24h">-24 Ore</option>
+            <option value="phase-neon">-12 Ore (Neon)</option>
+            <option value="phase-video">-1 Ora (Video)</option>
         </select>
-        <div style="margin-top:10px; border-top:1px solid #555; padding-top:5px;">
-            <button onclick="skipPhase()">FUOCHI D'ARTIFICIO (Test)</button>
+        
+        <div style="margin-top:10px; padding-top:5px; border-top:1px solid #555;">
+            <button onclick="debugFinalTenSeconds()">TEST ULTIMI 10 SEC</button>
+            <button onclick="triggerFireworksMode()">FINE IMMEDIATA</button>
         </div>
+        <div style="margin-top:5px; font-size:10px; color:#aaa;">Premi ESC per chiudere</div>
     </div>
 
     <script>
         // --- TEXT SCRAMBLE ---
         class TextScramble {
-            constructor(el) {
-                this.el = el;
-                this.chars = '!<>-_\\/[]{}—=+*^?#________'; 
-                this.update = this.update.bind(this);
-            }
+            constructor(el) { this.el = el; this.chars = '!<>-_\\/[]{}—=+*^?#________'; this.update = this.update.bind(this); }
             setText(newText) {
-                const oldText = this.el.innerText;
-                const length = Math.max(oldText.length, newText.length);
+                const oldText = this.el.innerText; const length = Math.max(oldText.length, newText.length);
                 const promise = new Promise((resolve) => this.resolve = resolve);
                 this.queue = [];
                 for (let i = 0; i < length; i++) {
-                    const from = oldText[i] || '';
-                    const to = newText[i] || '';
-                    const start = Math.floor(Math.random() * 100); 
-                    const end = start + Math.floor(Math.random() * 120) + 60; 
+                    const from = oldText[i] || ''; const to = newText[i] || '';
+                    const start = Math.floor(Math.random() * 40); const end = start + Math.floor(Math.random() * 40) + 20; 
                     this.queue.push({ from, to, start, end });
                 }
-                cancelAnimationFrame(this.frameRequest);
-                this.frame = 0;
-                this.update();
-                return promise;
+                cancelAnimationFrame(this.frameRequest); this.frame = 0; this.update(); return promise;
             }
             update() {
-                let output = '';
-                let complete = 0;
+                let output = ''; let complete = 0;
                 for (let i = 0, n = this.queue.length; i < n; i++) {
                     let { from, to, start, end, char } = this.queue[i];
                     if (this.frame >= end) { complete++; output += to; } 
@@ -269,235 +272,327 @@
                     } else { output += from; }
                 }
                 this.el.innerHTML = output;
-                if (complete === this.queue.length) { this.resolve(); } 
-                else { this.frameRequest = requestAnimationFrame(this.update); this.frame++; }
+                if (complete === this.queue.length) { this.resolve(); } else { this.frameRequest = requestAnimationFrame(this.update); this.frame++; }
             }
             randomChar() { return this.chars[Math.floor(Math.random() * this.chars.length)]; }
         }
-
-        const phrases = [ "Orbis ti sta aspettando.", "L'ombra di Varyn si avvicina.", "Ogni blocco racconta una storia.", "Preparati a varcare il portale.", "L'avventura di una vita sta per iniziare." ];
-        const el = document.getElementById('scramble-text');
-        const fx = new TextScramble(el);
-        let counter = 0; let scrambleLoopActive = true;
-        const nextPhrase = () => {
-            if (!scrambleLoopActive) return;
-            fx.setText(phrases[counter]).then(() => { setTimeout(nextPhrase, 3000); });
-            counter = (counter + 1) % phrases.length;
+        const phrases = ["Il destino di Orbis ti attende.", "Gaia ti chiama.", "Un'avventura infinita.", "Preparati al viaggio.", "Ogni blocco racconta una storia."];
+        const textElement = document.getElementById('scramble-text');
+        const fx = new TextScramble(textElement);
+        let counter = 0;
+        let loopActive = true;
+        const nextPhrase = () => { 
+            if(!loopActive) return;
+            fx.setText(phrases[counter]).then(() => { setTimeout(nextPhrase, 2000); }); counter = (counter + 1) % phrases.length; 
         };
         nextPhrase();
 
-        // --- TIMER & FIREWORKS LOGIC ---
-        const targetDate = new Date('2026-01-13T15:00:00Z'); 
-        
-        let activeTarget = targetDate;
-        const CRITICAL_THRESHOLD_MS = 60 * 60 * 1000;
-        const DAY_24_THRESHOLD_MS = 24 * 60 * 60 * 1000;
-        const WEEK_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000;
+        // --- COLORI NEON ORARI ---
+        const hourlyColors = [
+            '#ffffff', 
+            '#00ffff', '#ff00ff', '#00ff00', '#ffff00', 
+            '#ff0000', '#0000ff', '#ff8000', '#8000ff', 
+            '#00ff80', '#ff0080', '#0080ff', '#80ff00'
+        ];
 
-        let lastPhase = '';
-        let debugClass = '';
+        // --- GESTIONE DEBUG & LOGICA ---
+        let manualOverride = false;
         let isFireworksActive = false;
 
-        const container = document.getElementById('main-container');
-        const flashOverlay = document.getElementById('flash-overlay');
+        function applyDebug(phase) {
+            manualOverride = true;
+            document.body.className = phase;
+            const video = document.getElementById('video-bg');
+            const secondary = document.getElementById('secondary-timer');
 
-        let colors = ['252, 209, 91', '230, 230, 230', '24, 34, 49', '255, 255, 255'];
-        const fireworkColors = ['255, 0, 0', '0, 255, 0', '0, 0, 255', '255, 255, 0', '255, 0, 255', '0, 255, 255', '255, 165, 0'];
+            // Reset stili inline
+            resetNeonStyles();
 
-        function applyDebugClass(className) {
-            document.body.classList.remove('critical', 'aura-19', 'aura-18', 'phase-24h', 'phase-week');
-            if (className) document.body.classList.add(className);
-            updateColorsForPhase(className);
-            debugClass = className;
-        }
-
-        function updateColorsForPhase(phase) {
-            if (phase === 'aura-19') { colors = ['0, 229, 255', '255, 255, 255', '200, 250, 255', '0, 150, 255']; } 
-            else if (phase === 'aura-18') { colors = ['255, 0, 255', '138, 43, 226', '0, 255, 255', '255, 255, 255']; } 
-            else if (phase === 'critical') { colors = ['255, 0, 0', '255, 165, 0', '100, 0, 0', '255, 255, 0']; } 
-            else if (phase === 'phase-24h') { colors = ['255, 174, 0', '255, 220, 100', '100, 50, 0', '255, 255, 255']; }
-            else if (phase === 'phase-week') { colors = ['46, 255, 80', '150, 255, 170', '10, 50, 20', '255, 255, 255']; }
-            else { colors = ['252, 209, 91', '230, 230, 230', '24, 34, 49', '255, 255, 255']; }
-        }
-
-        function skipPhase() { activeTarget = new Date(new Date().getTime() + 1000); }
-        
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'd') {
-                const debugDiv = document.getElementById('debug-controls');
-                debugDiv.style.display = debugDiv.style.display === 'block' ? 'none' : 'block';
-            }
-        });
-
-        function triggerFireworksMode() {
-            if(isFireworksActive) return;
-            isFireworksActive = true;
-            scrambleLoopActive = false;
-            flashOverlay.style.opacity = '1';
-            setTimeout(() => { flashOverlay.style.opacity = '0'; }, 100);
-            particles = []; 
-            container.style.opacity = '0';
-            container.style.transform = 'scale(0.8)';
-            document.body.className = ''; 
-            updateColorsForPhase(''); 
-
-            setTimeout(() => {
-                container.innerHTML = `
-                    <img src="https://hytale.com/static/images/logo.png" style="width:450px; margin-bottom: 20px; filter: drop-shadow(0 0 25px rgba(252, 209, 91, 0.8));">
-                    <h1 style="color: #FCD15B; font-size: 4.5rem; text-shadow: 0 0 30px #FCD15B;">EARLY ACCESS DISPONIBILE</h1>
-                    <p class="subtitle" style="color: #fff; font-size: 1.5rem; letter-spacing: 2px;">BENVENUTO SU ORBIS. IL PORTALE È APERTO.</p>
-                `;
-                container.style.opacity = '1';
-                container.style.transform = 'scale(1)';
-            }, 1500);
-        }
-
-        function launchFirework() {
-            const startX = Math.random() * window.innerWidth;
-            const startY = Math.random() * (window.innerHeight / 2) + 50; 
-            const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
-            for(let i=0; i<60; i++) { particles.push(new Particle(true, startX, startY, color)); }
-        }
-
-        function updateTimer() {
-            if(isFireworksActive) return;
-            const current = new Date().getTime();
-            const diff = activeTarget - current;
-            
-            if (diff <= 0) { triggerFireworksMode(); return; }
-
-            const totalHoursRemaining = Math.ceil(diff / (1000 * 60 * 60));
-            
-            if (!debugClass) {
-                let currentPhaseDetected = '';
-                if (diff <= CRITICAL_THRESHOLD_MS) currentPhaseDetected = 'critical';
-                else if (totalHoursRemaining === 19) currentPhaseDetected = 'aura-19';
-                else if (totalHoursRemaining === 18) currentPhaseDetected = 'aura-18';
-                else if (diff <= DAY_24_THRESHOLD_MS) currentPhaseDetected = 'phase-24h';
-                else if (diff <= WEEK_THRESHOLD_MS) currentPhaseDetected = 'phase-week';
-
-                if (currentPhaseDetected !== lastPhase) {
-                    document.body.classList.remove('critical', 'aura-19', 'aura-18', 'phase-24h', 'phase-week');
-                    if (currentPhaseDetected) document.body.classList.add(currentPhaseDetected);
-                    updateColorsForPhase(currentPhaseDetected);
-                    lastPhase = currentPhaseDetected;
+            if(phase === 'phase-video') {
+                video.play().catch(e => console.log("Click needed"));
+                particleColors = []; 
+                secondary.style.display = ''; // Lascia gestire al CSS (che ha !important)
+            } else {
+                video.pause();
+                video.style.opacity = '0';
+                secondary.style.display = 'block'; 
+                
+                if(phase === 'phase-neon') {
+                    forceTimerDisplay(0, 5, 0, 0);
+                    applyNeonStyle(hourlyColors[5]);
+                    particleColors = [hourlyColors[5]];
+                }
+                else if(phase === 'phase-week') {
+                    particleColors = ['46, 255, 80', '200, 255, 200'];
+                    forceTimerDisplay(6, 23, 0, 0);
+                }
+                else if(phase === 'phase-24h') {
+                    particleColors = ['255, 174, 0', '255, 220, 100'];
+                    forceTimerDisplay(0, 23, 59, 0);
+                }
+                else {
+                    particleColors = ['252, 209, 91', '255, 255, 255', '200, 230, 255'];
                 }
             }
+        }
 
-            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const s = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            if(document.getElementById("box-days")) { if (d > 0) document.getElementById("box-days").style.display = "block"; else document.getElementById("box-days").style.display = "none"; }
+        function applyNeonStyle(color) {
+            const h1 = document.querySelector('h1');
+            const cTitle = document.querySelector('.countup-title');
+            const boxes = document.querySelectorAll('.time-box, .countup-box');
+            const numbers = document.querySelectorAll('.number, .countup-number');
+
+            h1.style.color = color; h1.style.borderColor = color; h1.style.textShadow = `0 0 25px ${color}`;
+            if(cTitle) cTitle.style.color = color;
+            boxes.forEach(b => { b.style.borderColor = color; b.style.boxShadow = `0 0 20px ${color}66`; });
+            numbers.forEach(n => { n.style.color = color; });
+        }
+
+        function resetNeonStyles() {
+            const elements = document.querySelectorAll('h1, .countup-title, .time-box, .countup-box, .number, .countup-number');
+            elements.forEach(el => { el.style = ''; }); // Pulisce tutto lo style inline
+        }
+
+        function forceTimerDisplay(d, h, m, s) {
             if(document.getElementById("days")) document.getElementById("days").innerText = d < 10 ? "0" + d : d;
             if(document.getElementById("hours")) document.getElementById("hours").innerText = h < 10 ? "0" + h : h;
             if(document.getElementById("minutes")) document.getElementById("minutes").innerText = m < 10 ? "0" + m : m;
             if(document.getElementById("seconds")) document.getElementById("seconds").innerText = s < 10 ? "0" + s : s;
         }
 
-        setInterval(updateTimer, 1000);
-        updateTimer();
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && (e.key === 'd' || e.key === 'D')) {
+                e.preventDefault(); 
+                const debugDiv = document.getElementById('debug-controls');
+                debugDiv.style.display = debugDiv.style.display === 'block' ? 'none' : 'block';
+            }
+            if (e.key === 'Escape') document.getElementById('debug-controls').style.display = 'none';
+        });
 
-        // --- PARTICLES ENGINE ---
+        // --- DEBUG 10 SECONDI ---
+        function debugFinalTenSeconds() {
+            manualOverride = false; 
+            targetDate = new Date(new Date().getTime() + 10000); 
+            
+            // RESET
+            loopActive = true;
+            isFireworksActive = false;
+            document.body.className = '';
+            document.getElementById('main-container').style.opacity = '1';
+            document.getElementById('main-title').innerText = "PREPARATI AL LANCIO";
+            document.querySelector('.timer-wrapper').style.display = 'flex';
+            
+            // Fondamentale: puliamo lo stile inline display:none/block
+            // Così quando la classe .phase-video entra, il CSS !important vince
+            document.getElementById('secondary-timer').style.display = ''; 
+            document.getElementById('secondary-timer').style.opacity = '';
+            
+            resetNeonStyles();
+            particleColors = [];
+        }
+
+        function triggerFireworksMode() {
+            if(isFireworksActive) return; 
+            loopActive = false; 
+            manualOverride = true;
+            isFireworksActive = true; 
+            
+            document.body.className = 'phase-fireworks'; 
+            document.getElementById('video-bg').play().catch(e=>{});
+            particles = []; 
+
+            const container = document.getElementById('main-container');
+            container.style.opacity = 0;
+            
+            setTimeout(() => {
+                container.innerHTML = `
+                    <img src="https://hytale.com/static/images/logo.png" style="width:350px; margin-bottom: 20px; filter: drop-shadow(0 0 25px rgba(252, 209, 91, 0.8));">
+                    <h1 style="color: #FCD15B; font-size: 3.5rem; text-shadow: 0 0 30px #FCD15B;">EARLY ACCESS DISPONIBILE</h1>
+                    <p style="color: #fff; font-size: 1.5rem; letter-spacing: 2px; text-transform:uppercase;">Benvenuto su Orbis. Il portale è aperto.</p>
+                    <a href="https://hytale.com" target="_blank" style="margin-top:20px; display:inline-block; padding:15px 30px; border:2px solid #FCD15B; color:#FCD15B; text-decoration:none; font-weight:bold; text-transform:uppercase; border-radius:5px; transition:0.3s;">SCARICA ORA</a>
+                `;
+                container.style.opacity = 1;
+            }, 1000);
+        }
+
+        // --- TIMERS ---
+        let targetDate = new Date('2026-01-13T15:00:00Z'); 
+        const announceDate = new Date(2018, 11, 13, 18, 0, 0);
+        
+        function updateTimers() {
+            if(isFireworksActive) return; 
+
+            const now = new Date();
+            const diffDown = targetDate - now;
+
+            if (!manualOverride) {
+                if (diffDown <= 0) {
+                    triggerFireworksMode();
+                    return; 
+                }
+                
+                // Meno di 1 ORA -> VIDEO MODE
+                if (diffDown <= 3600000) { 
+                    if (!document.body.classList.contains('phase-video')) {
+                        document.body.className = 'phase-video';
+                        document.getElementById('video-bg').play().catch(e => {});
+                        particleColors = []; 
+                        resetNeonStyles();
+                    }
+                }
+                // Meno di 12 ORE -> NEON MODE ORARIO
+                else if (diffDown <= 3600000 * 12) {
+                    const hoursLeft = Math.ceil(diffDown / 3600000);
+                    const color = hourlyColors[hoursLeft] || hourlyColors[12];
+                    
+                    document.body.className = 'phase-neon'; 
+                    applyNeonStyle(color);
+                    particleColors = [color];
+                }
+                // Meno di 24 ORE
+                else if (diffDown <= 3600000 * 24) {
+                    if (!document.body.classList.contains('phase-24h')) {
+                        document.body.className = 'phase-24h';
+                        particleColors = ['255, 174, 0', '255, 220, 100'];
+                        resetNeonStyles();
+                    }
+                }
+                // Meno di 1 SETTIMANA
+                else if (diffDown <= 3600000 * 24 * 7) {
+                    if (!document.body.classList.contains('phase-week')) {
+                        document.body.className = 'phase-week';
+                        particleColors = ['46, 255, 80', '200, 255, 200'];
+                        resetNeonStyles();
+                    }
+                }
+                else {
+                    if (document.body.className !== '') {
+                        document.body.className = '';
+                        particleColors = ['252, 209, 91', '255, 255, 255', '200, 230, 255'];
+                        resetNeonStyles();
+                    }
+                }
+            }
+
+            if (diffDown > 0 && !manualOverride) {
+                if(document.getElementById("days")) {
+                    document.getElementById("days").innerText = Math.floor(diffDown / 86400000);
+                    document.getElementById("hours").innerText = Math.floor((diffDown % 86400000) / 3600000).toString().padStart(2, '0');
+                    document.getElementById("minutes").innerText = Math.floor((diffDown % 3600000) / 60000).toString().padStart(2, '0');
+                    document.getElementById("seconds").innerText = Math.floor((diffDown % 60000) / 1000).toString().padStart(2, '0');
+                }
+            }
+
+            // Count Up
+            let years = now.getFullYear() - announceDate.getFullYear();
+            let months = now.getMonth() - announceDate.getMonth();
+            let days = now.getDate() - announceDate.getDate();
+            if (days < 0) { months--; let prevMonth = new Date(now.getFullYear(), now.getMonth(), 0).getDate(); days += prevMonth; }
+            if (months < 0) { years--; months += 12; }
+            
+            if(document.getElementById("up-years")) {
+                document.getElementById("up-years").innerText = years;
+                document.getElementById("up-months").innerText = months;
+                document.getElementById("up-days").innerText = days;
+                document.getElementById("up-hours").innerText = now.getHours().toString().padStart(2, '0');
+                document.getElementById("up-minutes").innerText = now.getMinutes().toString().padStart(2, '0');
+                document.getElementById("up-seconds").innerText = now.getSeconds().toString().padStart(2, '0');
+            }
+        }
+        setInterval(updateTimers, 1000); updateTimers();
+
+        // --- PARTICELLE ---
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
-        let width, height;
-        let particles = [];
+        let width, height, particles = [];
+        let particleColors = ['252, 209, 91', '255, 255, 255', '200, 230, 255'];
+        const fireworkColors = ['255,0,0', '0,255,0', '0,0,255', '255,255,0', '255,0,255', '0,255,255'];
 
         function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
         window.addEventListener('resize', resize); resize();
 
         class Particle {
-            constructor(isFirework = false, startX = 0, startY = 0, colorOverride = null) { 
+            constructor(isFirework = false, x = 0, y = 0, color = null) { 
                 this.isFirework = isFirework;
-                this.startX = startX;
-                this.startY = startY;
-                this.colorOverride = colorOverride;
-                this.reset(); 
+                if(isFirework) this.resetFirework(x, y, color);
+                else this.resetAmbient(true);
             }
             
-            reset() {
-                if (this.isFirework) {
-                    this.x = this.startX;
-                    this.y = this.startY;
-                    const angle = Math.random() * Math.PI * 2;
-                    const velocity = Math.random() * 6 + 2; 
-                    this.speedX = Math.cos(angle) * velocity;
-                    this.speedY = Math.sin(angle) * velocity;
-                    this.size = Math.random() * 3 + 1;
-                    this.life = Math.random() * 50 + 40;
-                    this.opacity = 1;
-                    this.friction = 0.96; 
-                    this.gravity = 0.15;   
-                } else {
-                    this.x = Math.random() * width; this.y = Math.random() * height;
-                    this.size = Math.random() * 2 + 1; 
-                    this.speedX = Math.random() * 1 - 0.5; this.speedY = Math.random() * 1 - 0.5;
-                    this.life = Math.random() * 100 + 50; this.opacity = Math.random() * 0.5 + 0.2;
-                    if (document.body.classList.contains('critical')) { this.speedX *= 3; this.speedY *= 3; }
-                }
-                this.colorIndex = Math.floor(Math.random() * colors.length);
-                this.isOrb = Math.random() < 0.1; 
-                if (this.isOrb && !this.isFirework) { this.size = Math.random() * 4 + 2; this.speedY = -Math.random() * 1.5; this.opacity = 0.8; }
-            }
-            
-            update() {
-                if (this.isFirework) {
-                    this.speedX *= this.friction; this.speedY *= this.friction; this.speedY += this.gravity;
-                    this.x += this.speedX; this.y += this.speedY; this.life--; this.opacity -= 0.01;
-                } else {
-                    this.x += this.speedX; this.y += this.speedY; this.life--;
-                    if (this.life < 20) this.opacity -= 0.02;
-                    if (this.life <= 0 || this.opacity <= 0 || this.x < -10 || this.x > width + 10) this.reset();
-                }
-            }
-            
-            draw() {
-                if (this.opacity <= 0) return;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                let fillStyle;
-                if(this.isFirework && this.colorOverride) {
-                    fillStyle = `rgba(${this.hexToRgb(this.colorOverride)}, ${this.opacity})`;
-                } else {
-                    const col = colors[this.colorIndex % colors.length]; 
-                    fillStyle = `rgba(${col}, ${this.opacity})`;
-                }
-                ctx.fillStyle = fillStyle;
-                if (this.isOrb || this.isFirework) { ctx.shadowBlur = 8; ctx.shadowColor = fillStyle; }
-                ctx.fill();
+            resetAmbient(initial = false) {
+                if(particleColors.length === 0) return;
+                this.x = Math.random() * width; this.y = Math.random() * height;
+                this.size = Math.random() * 3.5 + 0.5; this.opacity = Math.random() * 0.6 + 0.4; 
+                this.speedX = (Math.random() - 0.5) * 1.5; this.speedY = (Math.random() - 0.5) * 1.5;
+                this.life = Math.random() * 0.6 + 0.4;
+                this.color = particleColors.length > 0 ? particleColors[Math.floor(Math.random() * particleColors.length)] : '0,0,0';
             }
 
-            hexToRgb(hex) {
-                 if(hex.includes(',')) return hex;
-                 return '255, 255, 255'; 
+            resetFirework(x, y, color) {
+                this.x = x; this.y = y;
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 5 + 2;
+                this.speedX = Math.cos(angle) * velocity;
+                this.speedY = Math.sin(angle) * velocity;
+                this.size = Math.random() * 3 + 1;
+                this.opacity = 1;
+                this.life = 1;
+                this.color = color;
+                this.gravity = 0.15;
+                this.friction = 0.96;
+            }
+
+            update() {
+                if(this.isFirework) {
+                    this.speedX *= this.friction; this.speedY *= this.friction; this.speedY += this.gravity;
+                    this.x += this.speedX; this.y += this.speedY;
+                    this.life -= 0.015; this.opacity = this.life;
+                } else {
+                    this.x += this.speedX; this.y += this.speedY;
+                    if(this.life > 0) this.life -= 0.003; 
+                    if (this.x < -20 || this.x > width + 20 || this.y < -20 || this.y > height + 20 || this.life <= 0) this.resetAmbient();
+                }
+            }
+
+            draw() {
+                if(this.life <= 0) return;
+                if(!this.isFirework && particleColors.length === 0) return;
+
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                const currentOpacity = this.opacity * this.life;
+                ctx.fillStyle = `rgba(${this.color}, ${currentOpacity})`;
+                if (this.isFirework || (this.size > 2.5 && currentOpacity > 0.5)) { 
+                    ctx.shadowBlur = 10; ctx.shadowColor = `rgba(${this.color}, ${currentOpacity})`; 
+                } else { ctx.shadowBlur = 0; }
+                ctx.fill(); ctx.shadowBlur = 0;
             }
         }
 
-        function init() { particles = []; for (let i = 0; i < 150; i++) particles.push(new Particle()); }
+        function launchFirework() {
+            const startX = Math.random() * width;
+            const startY = Math.random() * (height / 2);
+            const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+            for(let i=0; i<40; i++) particles.push(new Particle(true, startX, startY, color));
+        }
+
+        function init() { particles = []; for (let i = 0; i < 280; i++) particles.push(new Particle(false)); }
+        
         function animate() {
             ctx.clearRect(0, 0, width, height);
-            if (isFireworksActive && Math.random() < 0.05) { launchFirework(); }
+            ctx.globalCompositeOperation = 'lighter'; 
             
             if(isFireworksActive) {
-                for (let i = particles.length - 1; i >= 0; i--) {
+                if(Math.random() < 0.05) launchFirework();
+                for(let i = particles.length - 1; i >= 0; i--) {
                     particles[i].update(); particles[i].draw();
-                    if (particles[i].life <= 0 || particles[i].opacity <= 0) { particles.splice(i, 1); }
+                    if(particles[i].life <= 0) particles.splice(i, 1);
                 }
             } else {
-                for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); }
+                particles.forEach(p => { p.update(); p.draw(); });
             }
+
+            ctx.globalCompositeOperation = 'source-over';
             requestAnimationFrame(animate);
         }
-        
-        const bgImg = document.getElementById('bg-img-placeholder');
-        const bgGradient = document.getElementById('bg-gradient');
-        window.addEventListener('mousemove', (e) => {
-            const mouseX = e.clientX - width / 2; const mouseY = e.clientY - height / 2;
-            bgImg.style.transform = `translate(${mouseX * 0.002}px, ${mouseY * 0.002}px)`;
-            bgGradient.style.transform = `translate(${mouseX * 0.005}px, ${mouseY * 0.005}px)`;
-        });
-
         init(); animate();
     </script>
 </body>
