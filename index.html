@@ -48,7 +48,8 @@
         }
 
         canvas { 
-            display: block; position: absolute; top: 0; left: 0; z-index: 5; 
+            display: block; position: absolute; top: 0; left: 0; 
+            z-index: 25; /* CORRETTO: Ora è sopra la vignetta (era 5) */
             pointer-events: none; transition: opacity 1s; 
         }
 
@@ -438,6 +439,7 @@
             if(isFireworksActive) return; 
             isFireworksActive = true; 
             
+            // Ferma il loop del testo e i timer
             loopActive = false; 
             manualOverride = true; 
             
@@ -445,26 +447,32 @@
             
             const video = document.getElementById('video-bg');
             video.style.opacity = '1';
-            video.play().catch(e=>{});
+            // Il catch vuoto evita errori se il browser blocca l'autoplay
+            video.play().catch(e => console.log("Autoplay bloccato dal browser")); 
             
-            // Reset Particelle
+            // Reset Particelle per preparare i fuochi
             particles = []; 
             
-            // LOGICA DI TRANSIZIONE (JS gestisce tutto)
-            // 1. Fade out timer (Main Container)
+            // 1. Fade out del timer (Main Container)
             mainContainer.style.opacity = '0';
             
             // 2. Dopo 1 sec, nascondi timer e mostra finale
             setTimeout(() => {
-                // Nascondiamo il timer
+                // Nascondiamo definitivamente il timer
                 mainContainer.style.display = 'none';
                 
-                // Mostriamo il finale (che è position:fixed)
+                // Prepariamo la schermata finale
                 finalScreen.style.display = 'flex';
-                // Trigger reflow forzato
-                void finalScreen.offsetWidth; 
-                // Fade in finale
-                finalScreen.style.opacity = '1';
+                
+                // TRUCCO IMPORTANTE: Doppio requestAnimationFrame per garantire 
+                // che il browser applichi il 'display: flex' PRIMA di cambiare l'opacità
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        finalScreen.style.opacity = '1';
+                        // Lancia qualche fuoco extra subito per effetto scenico
+                        for(let i=0; i<5; i++) launchFirework();
+                    });
+                });
             }, 1000);
         }
 
