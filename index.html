@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hytale Countdown - Final Version</title>
+    <title>Hytale Countdown - Final Reliable Version</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,7 +49,7 @@
 
         canvas { 
             display: block; position: absolute; top: 0; left: 0; 
-            z-index: 90; /* FORZATO ALTO: Sopra vignette e sfondi, sotto il testo finale (100) */
+            z-index: 90; /* Sopra a tutto lo sfondo */
             pointer-events: none; transition: opacity 1s; 
         }
 
@@ -58,22 +58,48 @@
             position: relative; z-index: 10; display: flex; flex-direction: column;
             justify-content: center; align-items: center; width: 100%; height: 100vh;
             text-align: center; color: #ffffff; padding: 10px; box-sizing: border-box;
-            transition: opacity 1s ease; /* Fade out smooth */
+            transition: opacity 1s ease;
         }
 
-        /* --- SCHERMATA FINALE (OVERLAY INDIPENDENTE) --- */
+        /* --- SCHERMATA FINALE --- */
         #final-screen {
-            position: fixed; /* Si sovrappone a tutto */
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; /* Il livello più alto */
-            display: none; /* Nascosto JS lo attiva */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 100; /* LIVELLO MASSIMO */
+            display: none; /* Default nascosto */
             flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.3); /* Leggero scurimento per contrasto */
-            opacity: 0; 
-            transition: opacity 2s ease-in;
-            text-align: center;
+            background: rgba(0,0,0,0.4); 
+            opacity: 0;
             padding: 20px;
             box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        /* --- LOGICA DI VISUALIZZAZIONE ROBUSTA (CSS CLASSES) --- */
+        
+        /* 1. Fase Iniziale Fuochi: Fade Out Timer, Video On */
+        body.phase-fireworks #main-container {
+            opacity: 0 !important;
+            transition: opacity 1s ease-out;
+            pointer-events: none;
+        }
+        body.phase-fireworks #video-bg { opacity: 1 !important; }
+        body.phase-fireworks .bg-gradient { opacity: 0.2 !important; }
+        body.phase-fireworks canvas { opacity: 1 !important; }
+
+        /* 2. Fase Finale UI: Nascondi Timer, Mostra Finale */
+        body.show-final-ui #main-container {
+            display: none !important; /* Rimuove dal layout */
+        }
+        
+        body.show-final-ui #final-screen {
+            display: flex !important; /* Forza visualizzazione */
+            pointer-events: auto !important;
+            animation: fadeInFinal 1.5s ease-out forwards; /* Forza animazione */
+        }
+
+        @keyframes fadeInFinal {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         /* ELEMENTI GRAFICI */
@@ -149,7 +175,7 @@
             text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; opacity: 0.8; font-weight: 600;
         }
 
-        /* --- FASI --- */
+        /* --- FASI TIMER (Settimana, 24h, Video) --- */
         body.phase-week .bg-gradient { background: radial-gradient(circle at center, rgba(10, 40, 20, 0.9) 0%, rgba(2, 15, 5, 0.98) 100%); }
         body.phase-week h1, body.phase-week .countup-title { color: #5eff80; border-color: #5eff80; text-shadow: 0 0 25px #00ff64; }
         body.phase-week .time-box, body.phase-week .countup-box { border-color: #2eff50; box-shadow: 0 0 20px rgba(46, 255, 80, 0.2); }
@@ -167,43 +193,25 @@
         body.phase-video .countup-section { display: none !important; } 
         
         body.phase-video .time-box { 
-            background-color: rgba(24, 34, 49, 0.85); 
-            border-color: #FCD15B; 
+            background-color: rgba(24, 34, 49, 0.85); border-color: #FCD15B; 
             box-shadow: 0 0 30px rgba(252, 209, 91, 0.3); 
         }
         body.phase-video h1, body.phase-video .number { 
-            color: #FCD15B; 
-            text-shadow: 0 0 20px rgba(252, 209, 91, 0.6); 
+            color: #FCD15B; text-shadow: 0 0 20px rgba(252, 209, 91, 0.6); 
             border-bottom-color: #FCD15B;
         }
-
-        /* FASE FUOCHI (0 SEC - FINALE) */
-        body.phase-fireworks #video-bg { opacity: 1 !important; }
-        body.phase-fireworks .bg-gradient { opacity: 0.2; }
-        body.phase-fireworks canvas { opacity: 1 !important; }
 
         /* --- STILI PULSANTE FINALE --- */
         .download-btn {
             font-family: 'Lexend', sans-serif; 
-            display:inline-block; 
-            padding:20px 50px; 
-            border:3px solid #FCD15B; 
+            display:inline-block; padding:20px 50px; border:3px solid #FCD15B; 
             background: linear-gradient(135deg, rgba(252, 209, 91, 0.1) 0%, rgba(200, 150, 50, 0.3) 100%); 
-            color:#FCD15B; 
-            text-decoration:none; 
-            font-weight:800; 
-            font-size: 1.5rem;
-            text-transform:uppercase; 
-            border-radius:8px; 
-            transition:all 0.3s ease; 
-            box-shadow: 0 0 25px rgba(252,209,91,0.3);
-            cursor:pointer;
-            pointer-events: auto;
+            color:#FCD15B; text-decoration:none; font-weight:800; font-size: 1.5rem;
+            text-transform:uppercase; border-radius:8px; transition:all 0.3s ease; 
+            box-shadow: 0 0 25px rgba(252,209,91,0.3); cursor:pointer; pointer-events: auto;
         }
         .download-btn:hover {
-            background: rgba(252, 209, 91, 0.9);
-            color: #000;
-            box-shadow: 0 0 50px rgba(252,209,91,0.8);
+            background: rgba(252, 209, 91, 0.9); color: #000; box-shadow: 0 0 50px rgba(252,209,91,0.8);
         }
 
         /* --- DEBUG MENU --- */
@@ -211,8 +219,8 @@
             position: fixed; top: 20px; right: 20px; 
             background: rgba(0, 0, 0, 0.9); border: 1px solid #444;
             padding: 15px; border-radius: 8px; color: white; z-index: 9999; 
-            font-family: 'Nunito Sans', sans-serif;
-            font-size: 13px; display: none; box-shadow: 0 0 15px rgba(0,0,0,0.8);
+            font-family: 'Nunito Sans', sans-serif; font-size: 13px; display: none; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
         }
         #debug-controls select { background: #222; color: #fff; border: 1px solid #555; padding: 5px; margin-top: 5px; width: 100%; font-family: inherit; }
         #debug-controls button {
@@ -221,7 +229,6 @@
         }
         #debug-controls button:hover { background: #555; }
         
-        /* DEBUG TRIGGER BUTTON (NEW) */
         #dev-trigger {
             position: fixed; bottom: 5px; right: 5px;
             background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3);
@@ -355,7 +362,10 @@
         // --- GLOBAL CONFIG ---
         let manualOverride = false;
         let isFireworksActive = false;
-        // DATA DI LANCIO - SETTARE QUI
+        
+        // --- DATA DI LANCIO ---
+        // Attenzione: se testi oggi (2026), il timer potrebbe essere già a zero.
+        // Impostala nel futuro per vedere il conto alla rovescia.
         let targetDate = new Date('2026-01-13T15:00:00Z'); 
         const announceDate = new Date(2018, 11, 13, 18, 0, 0);
 
@@ -371,16 +381,12 @@
 
         function applyDebug(phase) {
             manualOverride = true;
-            document.body.className = phase;
+            document.body.className = phase; // Reset altre classi
             const video = document.getElementById('video-bg');
             const secondary = document.getElementById('secondary-timer');
 
-            // Reset visivi sicuri
-            mainContainer.style.display = 'flex';
-            mainContainer.style.opacity = '1';
-            finalScreen.style.display = 'none';
-            finalScreen.style.opacity = '0';
-            
+            // Reset visivo forzato
+            document.body.classList.remove('phase-fireworks', 'show-final-ui');
             resetInlineStyles(); 
 
             if(phase === 'phase-video') {
@@ -406,6 +412,9 @@
         }
 
         function resetInlineStyles() {
+            // Rimuove stili inline per lasciare controllo al CSS
+            mainContainer.style = '';
+            finalScreen.style = '';
             const elements = document.querySelectorAll('h1, .countup-title, .time-box, .countup-box, .number, .countup-number');
             elements.forEach(el => { el.style = ''; });
         }
@@ -418,7 +427,6 @@
         }
 
         document.addEventListener('keydown', (e) => {
-            // Nuova shortcut: Solo tasto 'D' (o 'd')
             if (e.key === 'd' || e.key === 'D') {
                 toggleDebug();
             }
@@ -427,69 +435,46 @@
 
         function debugFinalTenSeconds() {
             manualOverride = false; 
-            targetDate = new Date(Date.now() + 11000); // 11 secondi buffer
+            targetDate = new Date(Date.now() + 11000); // 11 secondi
             
-            // RESET STATES
+            // RESET TOTALE
             loopActive = true; 
             isFireworksActive = false;
-            document.body.className = '';
+            document.body.className = ''; 
+            document.body.classList.remove('phase-fireworks', 'show-final-ui');
             
-            // FORCE VISUAL RESET (JS Driven)
-            mainContainer.style.display = 'flex';
-            // Piccola pausa per permettere il reflow prima di settare opacità
-            setTimeout(() => { mainContainer.style.opacity = '1'; }, 10);
-            
-            finalScreen.style.opacity = '0';
-            finalScreen.style.display = 'none';
-            
-            document.querySelector('.timer-wrapper').style.display = 'flex';
-            document.getElementById('secondary-timer').style.display = ''; 
-            
+            // Assicuriamoci che il timer sia visibile
             resetInlineStyles();
+            
             particleColors = [];
             updateTimers();
         }
 
-        // --- TRIGGER FINALE CORRETTO ---
+        // --- TRIGGER FINALE ROBUSTO (CSS BASED) ---
         function triggerFireworksMode() {
             if(isFireworksActive) return; 
             isFireworksActive = true; 
             
-            // Ferma il loop del testo e i timer
             loopActive = false; 
             manualOverride = true; 
             
-            document.body.className = 'phase-fireworks'; 
+            // 1. Attiva Fase Fuochi (Il CSS nasconde il timer e accende il video)
+            document.body.classList.add('phase-fireworks');
             
             const video = document.getElementById('video-bg');
-            video.style.opacity = '1';
-            // Il catch vuoto evita errori se il browser blocca l'autoplay
-            video.play().catch(e => console.log("Autoplay bloccato dal browser")); 
+            video.style.opacity = '1'; 
+            video.play().catch(e => console.log("Autoplay bloccato")); 
             
-            // Reset Particelle per preparare i fuochi
             particles = []; 
             
-            // 1. Fade out del timer (Main Container)
-            mainContainer.style.opacity = '0';
-            
-            // 2. Dopo 1 sec, nascondi timer e mostra finale
+            // 2. Dopo 1.2 secondi, attiva Fase UI Finale (Il CSS mostra la schermata finale)
             setTimeout(() => {
-                // Nascondiamo definitivamente il timer
-                mainContainer.style.display = 'none';
+                document.body.classList.add('show-final-ui');
                 
-                // Prepariamo la schermata finale
-                finalScreen.style.display = 'flex';
+                // Lancia fuochi extra per celebrare
+                for(let i=0; i<15; i++) launchFirework();
                 
-                // TRUCCO IMPORTANTE: Doppio requestAnimationFrame per garantire 
-                // che il browser applichi il 'display: flex' PRIMA di cambiare l'opacità
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        finalScreen.style.opacity = '1';
-                        // Lancia qualche fuoco extra subito per effetto scenico
-                        for(let i=0; i<10; i++) launchFirework();
-                    });
-                });
-            }, 1000);
+            }, 1200); 
         }
 
         // --- TIMER LOGIC ---
@@ -507,7 +492,7 @@
                     return; 
                 }
                 
-                // GESTIONE FASI
+                // GESTIONE FASI AUTOMATICA
                 if (diffDown <= 3600000) { // < 1 ORA
                     if (!document.body.classList.contains('phase-video')) {
                         document.body.className = 'phase-video';
@@ -531,6 +516,7 @@
                     }
                 }
                 else { // STANDARD
+                    // Pulisce le classi se torniamo indietro nel tempo col debug
                     if (document.body.className !== '') {
                         document.body.className = '';
                         particleColors = ['252, 209, 91', '255, 255, 255', '200, 230, 255'];
@@ -539,7 +525,7 @@
                 }
             }
 
-            // UI Update
+            // Aggiornamento Numeri
             if (diffDown > 0 && !manualOverride) {
                 if(document.getElementById("days")) {
                     document.getElementById("days").innerText = Math.floor(diffDown / 86400000);
@@ -549,7 +535,7 @@
                 }
             }
 
-            // Count Up Update
+            // Aggiornamento "Tempo dall'annuncio"
             let years = now.getFullYear() - announceDate.getFullYear();
             let months = now.getMonth() - announceDate.getMonth();
             let days = now.getDate() - announceDate.getDate();
