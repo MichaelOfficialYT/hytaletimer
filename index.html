@@ -291,7 +291,7 @@
         // --- VARIABILI GLOBALI ---
         let manualOverride = false;
         let isFireworksActive = false;
-        // DATA TARGET (Modifica qui la data)
+        // DATA TARGET DI ESEMPIO (2026)
         let targetDate = new Date('2026-01-13T15:00:00Z'); 
         const announceDate = new Date(2018, 11, 13, 18, 0, 0);
 
@@ -349,66 +349,78 @@
 
         function debugFinalTenSeconds() {
             manualOverride = false; 
-            targetDate = new Date(new Date().getTime() + 10000); // Imposta timer a 10 secondi da ORA
             
-            // RESET STATI
+            // FIX: Aggiungiamo 11 secondi (non 10) per compensare il delay di esecuzione
+            // In questo modo il Math.floor mostrerà subito "10" e non "9" o "8"
+            targetDate = new Date(Date.now() + 11000); 
+            
+            // RESET TOTALE
             loopActive = true; 
             isFireworksActive = false;
             document.body.className = '';
             
-            // Ripristina il contenitore se era stato cancellato
-            const container = document.getElementById('main-container');
-            container.style.opacity = '1';
-            
-            // Ricostruiamo l'HTML originale se necessario (perché triggerFireworks lo cancella)
-            if(!document.getElementById('days')) {
-                location.reload(); // Il modo più sicuro per resettare completamente l'HTML è ricaricare se siamo post-fuochi
-                return;
+            // Ripristina HTML Timer se necessario (se veniamo dalla schermata finale)
+            const wrapper = document.querySelector('.timer-wrapper');
+            if(!wrapper || wrapper.style.display === 'none') {
+                // Se l'HTML è stato distrutto, ricarichiamo la pagina per sicurezza
+                // oppure ricostruiamo l'HTML, ma il reload è più pulito per il debug
+                if(!document.getElementById('days')) location.reload();
             }
 
+            const container = document.getElementById('main-container');
+            container.style.opacity = '1';
+            container.style.display = 'flex';
             document.getElementById('main-title').innerText = "PREPARATI AL LANCIO";
-            document.querySelector('.timer-wrapper').style.display = 'flex';
+            
+            if(document.querySelector('.timer-wrapper')) {
+                document.querySelector('.timer-wrapper').style.display = 'flex';
+            }
             document.getElementById('secondary-timer').style.display = ''; 
             
             resetInlineStyles();
             particleColors = [];
+            
+            // FIX: Aggiorna il timer IMMEDIATAMENTE senza aspettare il prossimo tick di setInterval
+            updateTimers();
         }
 
         function triggerFireworksMode() {
+            // Impedisce esecuzioni multiple
             if(isFireworksActive) return; 
-            
-            // BLOCCO IMMEDIATO DI TUTTO
             isFireworksActive = true; 
+            
+            // Disattiva loop testi e override manuali
             loopActive = false; 
             manualOverride = true; 
             
+            // Attiva classe CSS e Video
             document.body.className = 'phase-fireworks'; 
-            
-            // Assicuriamo che il video continui a funzionare
             const video = document.getElementById('video-bg');
             video.style.opacity = '1';
             video.play().catch(e=>{});
             
-            particles = []; // Resetta particelle per preparare i fuochi
+            // Resetta particelle
+            particles = []; 
 
+            // FIX: Gestione transizione sicura
             const container = document.getElementById('main-container');
             
-            // Fase 1: Fade Out del vecchio timer
+            // 1. Fade out del timer attuale
             container.style.transition = 'opacity 1s ease';
             container.style.opacity = '0';
             
-            // Fase 2: Cambio contenuto dopo 1 secondo
+            // 2. Dopo 1 secondo, cambia contenuto e fai fade in
             setTimeout(() => {
-                // Sostituisce l'HTML
                 container.innerHTML = `
-                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%;">
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%;">
                         <img src="https://hytale.com/static/images/logo.png" style="width:350px; margin-bottom: 20px; filter: drop-shadow(0 0 25px rgba(252, 209, 91, 0.8));">
                         <h1 style="font-family: 'Lexend', sans-serif; color: #FCD15B; font-size: 3.5rem; text-shadow: 0 0 30px #FCD15B; margin-bottom:10px;">EARLY ACCESS DISPONIBILE</h1>
                         <p style="font-family: 'Nunito Sans', sans-serif; color: #fff; font-size: 1.5rem; letter-spacing: 2px; text-transform:uppercase; margin-bottom:30px;">Benvenuto su Orbis. Il portale è aperto.</p>
                         <a href="https://hytale.com" target="_blank" style="font-family: 'Lexend', sans-serif; display:inline-block; padding:15px 30px; border:2px solid #FCD15B; background:rgba(252, 209, 91, 0.1); color:#FCD15B; text-decoration:none; font-weight:bold; text-transform:uppercase; border-radius:5px; transition:0.3s; box-shadow: 0 0 15px rgba(252,209,91,0.2);">SCARICA ORA</a>
                     </div>
                 `;
-                // Fase 3: Fade In del nuovo contenuto
+                
+                // Forza il reflow e riporta opacità a 1
                 requestAnimationFrame(() => {
                     container.style.opacity = '1';
                 });
@@ -417,14 +429,17 @@
 
         // --- MAIN TIMER LOGIC ---
         function updateTimers() {
+            // Se siamo già nella fase finale, non fare nulla
             if(isFireworksActive) return; 
 
             const now = new Date();
             const diffDown = targetDate - now;
 
             if (!manualOverride) {
-                // SE IL TEMPO È SCADUTO (o quasi)
+                // SE IL TEMPO È SCADUTO
                 if (diffDown <= 0) {
+                    // Imposta i numeri a 00 prima di cambiare schermata
+                    if(document.getElementById("seconds")) document.getElementById("seconds").innerText = "00";
                     triggerFireworksMode();
                     return; 
                 }
