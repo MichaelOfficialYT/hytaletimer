@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hytale Countdown - Final Reliable Version</title>
+    <title>Hytale Countdown - Definitive Fix</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,15 +47,18 @@
             z-index: 2; transition: opacity 1.5s;
         }
 
+        /* CANVAS DEI FUOCHI - Z-INDEX ALZATO A 50 (Sopra vignette, sotto UI finale) */
         canvas { 
             display: block; position: absolute; top: 0; left: 0; 
-            z-index: 90; /* Sopra a tutto lo sfondo */
+            z-index: 50; 
             pointer-events: none; transition: opacity 1s; 
+            opacity: 0; /* Invisibile finché non parte la fase fuochi */
         }
 
         /* --- CONTENT CONTAINER (TIMER) --- */
         .container {
-            position: relative; z-index: 10; display: flex; flex-direction: column;
+            position: relative; z-index: 60; /* Sopra al canvas */
+            display: flex; flex-direction: column;
             justify-content: center; align-items: center; width: 100%; height: 100vh;
             text-align: center; color: #ffffff; padding: 10px; box-sizing: border-box;
             transition: opacity 1s ease;
@@ -64,42 +67,14 @@
         /* --- SCHERMATA FINALE --- */
         #final-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; /* LIVELLO MASSIMO */
-            display: none; /* Default nascosto */
+            z-index: 1000; /* LIVELLO MASSIMO ASSOLUTO */
+            display: none; /* Gestito da JS */
             flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.4); 
+            background: rgba(0,0,0,0.5); /* Sfondo semi-trasparente per far vedere i fuochi sotto */
             opacity: 0;
             padding: 20px;
             box-sizing: border-box;
-            pointer-events: none;
-        }
-
-        /* --- LOGICA DI VISUALIZZAZIONE ROBUSTA (CSS CLASSES) --- */
-        
-        /* 1. Fase Iniziale Fuochi: Fade Out Timer, Video On */
-        body.phase-fireworks #main-container {
-            opacity: 0 !important;
-            transition: opacity 1s ease-out;
-            pointer-events: none;
-        }
-        body.phase-fireworks #video-bg { opacity: 1 !important; }
-        body.phase-fireworks .bg-gradient { opacity: 0.2 !important; }
-        body.phase-fireworks canvas { opacity: 1 !important; }
-
-        /* 2. Fase Finale UI: Nascondi Timer, Mostra Finale */
-        body.show-final-ui #main-container {
-            display: none !important; /* Rimuove dal layout */
-        }
-        
-        body.show-final-ui #final-screen {
-            display: flex !important; /* Forza visualizzazione */
-            pointer-events: auto !important;
-            animation: fadeInFinal 1.5s ease-out forwards; /* Forza animazione */
-        }
-
-        @keyframes fadeInFinal {
-            0% { opacity: 0; transform: scale(0.95); }
-            100% { opacity: 1; transform: scale(1); }
+            transition: opacity 2s ease-in; /* Transizione lenta */
         }
 
         /* ELEMENTI GRAFICI */
@@ -175,7 +150,7 @@
             text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; opacity: 0.8; font-weight: 600;
         }
 
-        /* --- FASI TIMER (Settimana, 24h, Video) --- */
+        /* --- FASI TIMER --- */
         body.phase-week .bg-gradient { background: radial-gradient(circle at center, rgba(10, 40, 20, 0.9) 0%, rgba(2, 15, 5, 0.98) 100%); }
         body.phase-week h1, body.phase-week .countup-title { color: #5eff80; border-color: #5eff80; text-shadow: 0 0 25px #00ff64; }
         body.phase-week .time-box, body.phase-week .countup-box { border-color: #2eff50; box-shadow: 0 0 20px rgba(46, 255, 80, 0.2); }
@@ -189,8 +164,6 @@
         body.phase-video #video-bg { opacity: 1 !important; } 
         body.phase-video .bg-img-placeholder { opacity: 0 !important; } 
         body.phase-video .bg-gradient { opacity: 0.2 !important; }
-        body.phase-video canvas { opacity: 0; } 
-        body.phase-video .countup-section { display: none !important; } 
         
         body.phase-video .time-box { 
             background-color: rgba(24, 34, 49, 0.85); border-color: #FCD15B; 
@@ -372,6 +345,7 @@
         // --- DOM REFERENCES ---
         const mainContainer = document.getElementById('main-container');
         const finalScreen = document.getElementById('final-screen');
+        const canvasEl = document.getElementById('canvas');
 
         // --- DEBUG FUNCTIONALITY ---
         function toggleDebug() {
@@ -386,8 +360,13 @@
             const secondary = document.getElementById('secondary-timer');
 
             // Reset visivo forzato
-            document.body.classList.remove('phase-fireworks', 'show-final-ui');
             resetInlineStyles(); 
+            // Assicuriamoci che UI finale sia nascosta
+            finalScreen.style.display = 'none';
+            finalScreen.style.opacity = '0';
+            mainContainer.style.display = 'flex';
+            mainContainer.style.opacity = '1';
+            canvasEl.style.opacity = '0';
 
             if(phase === 'phase-video') {
                 video.play().catch(e => console.log("Click needed for video"));
@@ -412,7 +391,6 @@
         }
 
         function resetInlineStyles() {
-            // Rimuove stili inline per lasciare controllo al CSS
             mainContainer.style = '';
             finalScreen.style = '';
             const elements = document.querySelectorAll('h1, .countup-title, .time-box, .countup-box, .number, .countup-number');
@@ -441,16 +419,22 @@
             loopActive = true; 
             isFireworksActive = false;
             document.body.className = ''; 
-            document.body.classList.remove('phase-fireworks', 'show-final-ui');
             
-            // Assicuriamoci che il timer sia visibile
+            // Forziamo il ripristino del layout
+            mainContainer.style.display = 'flex';
+            mainContainer.style.opacity = '1';
+            
+            finalScreen.style.display = 'none';
+            finalScreen.style.opacity = '0';
+            
+            canvasEl.style.opacity = '0';
+            
             resetInlineStyles();
-            
             particleColors = [];
             updateTimers();
         }
 
-        // --- TRIGGER FINALE ROBUSTO (CSS BASED) ---
+        // --- TRIGGER FINALE MODIFICATO (FORCE JS) ---
         function triggerFireworksMode() {
             if(isFireworksActive) return; 
             isFireworksActive = true; 
@@ -458,23 +442,38 @@
             loopActive = false; 
             manualOverride = true; 
             
-            // 1. Attiva Fase Fuochi (Il CSS nasconde il timer e accende il video)
-            document.body.classList.add('phase-fireworks');
+            // 1. Attiva video sfondo e rimuove overlay scuri
+            document.body.className = 'phase-fireworks'; 
             
             const video = document.getElementById('video-bg');
             video.style.opacity = '1'; 
             video.play().catch(e => console.log("Autoplay bloccato")); 
-            
+
+            // 2. Mostra Canvas
+            canvasEl.style.opacity = '1';
             particles = []; 
             
-            // 2. Dopo 1.2 secondi, attiva Fase UI Finale (Il CSS mostra la schermata finale)
+            // 3. Nascondi Timer (Fade out)
+            mainContainer.style.opacity = '0';
+
+            // 4. SEQUENZA ROBUSTA PER SCHERMATA FINALE
             setTimeout(() => {
-                document.body.classList.add('show-final-ui');
+                // A. Rimuovi fisicamente il timer dal layout
+                mainContainer.style.display = 'none';
+
+                // B. Rendi visibile il container finale (ancora trasparente)
+                finalScreen.style.display = 'flex';
                 
-                // Lancia fuochi extra per celebrare
+                // C. Forza un reflow (trucco per riavviare il rendering CSS)
+                void finalScreen.offsetWidth;
+
+                // D. Applica l'opacità per la dissolvenza
+                finalScreen.style.opacity = '1';
+                
+                // E. Lancia fuochi extra
                 for(let i=0; i<15; i++) launchFirework();
                 
-            }, 1200); 
+            }, 1000); // Aspetta 1 secondo che il timer svanisca
         }
 
         // --- TIMER LOGIC ---
