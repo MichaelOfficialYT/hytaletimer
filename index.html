@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hytale Countdown - Simplified</title>
+    <title>Hytale Countdown - Final Version</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,6 +58,14 @@
             justify-content: center; align-items: center; width: 100%; height: 100vh;
             text-align: center; color: #ffffff; padding: 10px; box-sizing: border-box;
             transition: opacity 1s, transform 1s;
+        }
+        
+        /* Nascondiamo la schermata finale di default */
+        #final-screen {
+            display: none; opacity: 0;
+            flex-direction: column; align-items: center; justify-content: center;
+            width: 100%; height: 100%;
+            transition: opacity 2s ease-in;
         }
 
         #hytale-logo {
@@ -132,7 +140,7 @@
             text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; opacity: 0.8; font-weight: 600;
         }
 
-        /* --- FASI (COLORI SEMPLIFICATI) --- */
+        /* --- FASI --- */
         
         /* FASE -1 SETTIMANA (VERDE) */
         body.phase-week .bg-gradient { background: radial-gradient(circle at center, rgba(10, 40, 20, 0.9) 0%, rgba(2, 15, 5, 0.98) 100%); }
@@ -146,14 +154,13 @@
         body.phase-24h .time-box, body.phase-24h .countup-box { border-color: #ffae00; box-shadow: 0 0 25px rgba(255, 174, 0, 0.3); }
         body.phase-24h .number, body.phase-24h .countup-number { color: #fffbd0; }
 
-        /* FASE VIDEO (-1 ORA & VIDEO LOOP) */
+        /* FASE VIDEO (-1 ORA) */
         body.phase-video #video-bg { opacity: 1 !important; } 
         body.phase-video .bg-img-placeholder { opacity: 0 !important; } 
         body.phase-video .bg-gradient { opacity: 0.2 !important; }
         body.phase-video canvas { opacity: 0; } 
         body.phase-video .countup-section { display: none !important; } 
         
-        /* STILI HYTALE CLASSICI SOPRA IL VIDEO */
         body.phase-video .time-box { 
             background-color: rgba(24, 34, 49, 0.85); 
             border-color: #FCD15B; 
@@ -165,12 +172,39 @@
             border-bottom-color: #FCD15B;
         }
 
-        /* FASE FUOCHI (0 SEC) */
-        body.phase-fireworks #video-bg { opacity: 1; }
-        body.phase-fireworks .countup-section { display: none !important; }
-        body.phase-fireworks canvas { opacity: 1; } 
-        body.phase-fireworks .bg-img-placeholder { opacity: 0; }
+        /* FASE FUOCHI (0 SEC - FINALE) */
+        body.phase-fireworks #video-bg { opacity: 1 !important; }
         body.phase-fireworks .bg-gradient { opacity: 0.2; }
+        body.phase-fireworks canvas { opacity: 1 !important; }
+        
+        /* Nasconde il timer normale quando scoppiano i fuochi */
+        body.phase-fireworks #timer-container { display: none !important; }
+        
+        /* Mostra la schermata finale */
+        body.phase-fireworks #final-screen { display: flex !important; opacity: 1 !important; }
+
+        /* --- STILI PULSANTE FINALE --- */
+        .download-btn {
+            font-family: 'Lexend', sans-serif; 
+            display:inline-block; 
+            padding:20px 50px; 
+            border:3px solid #FCD15B; 
+            background: linear-gradient(135deg, rgba(252, 209, 91, 0.1) 0%, rgba(200, 150, 50, 0.3) 100%); 
+            color:#FCD15B; 
+            text-decoration:none; 
+            font-weight:800; 
+            font-size: 1.5rem;
+            text-transform:uppercase; 
+            border-radius:8px; 
+            transition:all 0.3s ease; 
+            box-shadow: 0 0 25px rgba(252,209,91,0.3);
+            cursor:pointer;
+        }
+        .download-btn:hover {
+            background: rgba(252, 209, 91, 0.9);
+            color: #000;
+            box-shadow: 0 0 50px rgba(252,209,91,0.8);
+        }
 
         /* --- DEBUG MENU --- */
         #debug-controls { 
@@ -200,27 +234,49 @@
     <canvas id="canvas"></canvas>
 
     <div class="container" id="main-container">
-        <img id="hytale-logo" src="https://hytale.com/static/images/logo.png" alt="Hytale Logo">
-        <h1 id="main-title">PREPARATI AL LANCIO</h1>
-        <p class="subtitle" id="scramble-text"></p>
         
-        <div class="timer-wrapper">
-            <div class="time-box"><span class="number" id="days">00</span><span class="label">Giorni</span></div>
-            <div class="time-box"><span class="number" id="hours">00</span><span class="label">Ore</span></div>
-            <div class="time-box"><span class="number" id="minutes">00</span><span class="label">Minuti</span></div>
-            <div class="time-box"><span class="number" id="seconds">00</span><span class="label">Secondi</span></div>
+        <div id="timer-container" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+            <img id="hytale-logo" src="https://hytale.com/static/images/logo.png" alt="Hytale Logo">
+            <h1 id="main-title">PREPARATI AL LANCIO</h1>
+            <p class="subtitle" id="scramble-text"></p>
+            
+            <div class="timer-wrapper">
+                <div class="time-box"><span class="number" id="days">00</span><span class="label">Giorni</span></div>
+                <div class="time-box"><span class="number" id="hours">00</span><span class="label">Ore</span></div>
+                <div class="time-box"><span class="number" id="minutes">00</span><span class="label">Minuti</span></div>
+                <div class="time-box"><span class="number" id="seconds">00</span><span class="label">Secondi</span></div>
+            </div>
+
+            <div class="countup-section" id="secondary-timer">
+                <div class="countup-title">TEMPO DALL'ANNUNCIO DEL GIOCO</div>
+                <div class="countup-wrapper">
+                    <div class="countup-box"><span class="countup-number" id="up-years">0</span><span class="countup-label">Anni</span></div>
+                    <div class="countup-box"><span class="countup-number" id="up-months">0</span><span class="countup-label">Mesi</span></div>
+                    <div class="countup-box"><span class="countup-number" id="up-days">0</span><span class="countup-label">Giorni</span></div>
+                    <div class="countup-box"><span class="countup-number" id="up-hours">00</span><span class="countup-label">Ore</span></div>
+                    <div class="countup-box"><span class="countup-number" id="up-minutes">00</span><span class="countup-label">Min</span></div>
+                    <div class="countup-box"><span class="countup-number" id="up-seconds">00</span><span class="countup-label">Sec</span></div>
+                </div>
+            </div>
         </div>
 
-        <div class="countup-section" id="secondary-timer">
-            <div class="countup-title">TEMPO DALL'ANNUNCIO DEL GIOCO</div>
-            <div class="countup-wrapper">
-                <div class="countup-box"><span class="countup-number" id="up-years">0</span><span class="countup-label">Anni</span></div>
-                <div class="countup-box"><span class="countup-number" id="up-months">0</span><span class="countup-label">Mesi</span></div>
-                <div class="countup-box"><span class="countup-number" id="up-days">0</span><span class="countup-label">Giorni</span></div>
-                <div class="countup-box"><span class="countup-number" id="up-hours">00</span><span class="countup-label">Ore</span></div>
-                <div class="countup-box"><span class="countup-number" id="up-minutes">00</span><span class="countup-label">Min</span></div>
-                <div class="countup-box"><span class="countup-number" id="up-seconds">00</span><span class="countup-label">Sec</span></div>
-            </div>
+        <div id="final-screen">
+            <img src="https://hytale.com/static/images/logo.png" 
+                    style="width:min(400px, 80vw); margin-bottom: 30px; filter: drop-shadow(0 0 35px rgba(252, 209, 91, 0.6)); animation: float 6s ease-in-out infinite;">
+            
+            <h1 style="font-family: 'Lexend', sans-serif; color: #fff; font-size: clamp(2rem, 5vw, 4rem); 
+                        text-shadow: 0 0 40px rgba(255, 255, 255, 0.5); margin-bottom:10px; line-height:1.1;">
+                IL PORTALE È APERTO
+            </h1>
+            
+            <p style="font-family: 'Nunito Sans', sans-serif; color: #E6E6E6; font-size: clamp(1rem, 2vw, 1.5rem); 
+                        letter-spacing: 3px; text-transform:uppercase; margin-bottom:40px; font-weight:600;">
+                Il tuo viaggio su Orbis inizia oggi.
+            </p>
+            
+            <a href="https://hytale.com" target="_blank" class="download-btn">
+                SCARICA IL GIOCO
+            </a>
         </div>
 
         <div class="legal-disclaimer">
@@ -246,8 +302,8 @@
         <div style="margin-top:5px; font-size:10px; color:#aaa;">Premi ESC per chiudere</div>
     </div>
 
-   <script>
-        // --- TEXT SCRAMBLE UTILITY (Effetto testo iniziale) ---
+    <script>
+        // --- TEXT SCRAMBLE UTILITY ---
         class TextScramble {
             constructor(el) { this.el = el; this.chars = '!<>-_\\/[]{}—=+*^?#________'; this.update = this.update.bind(this); }
             setText(newText) {
@@ -277,7 +333,6 @@
             randomChar() { return this.chars[Math.floor(Math.random() * this.chars.length)]; }
         }
         
-        // --- FRASI CICLICHE ---
         const phrases = ["Il destino di Orbis ti attende.", "Gaia ti chiama.", "Un'avventura infinita.", "Preparati al viaggio.", "Ogni blocco racconta una storia."];
         const textElement = document.getElementById('scramble-text');
         const fx = new TextScramble(textElement);
@@ -288,21 +343,24 @@
         };
         nextPhrase();
 
-        // --- VARIABILI GLOBALI ---
+        // --- GLOBAL CONFIG ---
         let manualOverride = false;
         let isFireworksActive = false;
-        
-        // --- DATA DI LANCIO (Modifica qui) ---
+        // DATA DI LANCIO - SETTARE QUI
         let targetDate = new Date('2026-01-13T15:00:00Z'); 
         const announceDate = new Date(2018, 11, 13, 18, 0, 0);
 
-        // --- GESTIONE DEBUG ---
+        // --- DEBUG FUNCTIONALITY ---
         function applyDebug(phase) {
             manualOverride = true;
             document.body.className = phase;
             const video = document.getElementById('video-bg');
             const secondary = document.getElementById('secondary-timer');
 
+            // Reset visivi
+            document.getElementById('timer-container').style.display = 'flex';
+            document.getElementById('final-screen').style.display = 'none';
+            document.getElementById('final-screen').style.opacity = '0';
             resetInlineStyles(); 
 
             if(phase === 'phase-video') {
@@ -350,21 +408,18 @@
 
         function debugFinalTenSeconds() {
             manualOverride = false; 
-            targetDate = new Date(Date.now() + 11000); // 10 secondi + 1 di buffer
+            // BUFFER DI 11 SECONDI PER VEDERE IL 10 PIENO
+            targetDate = new Date(Date.now() + 11000); 
             
-            // RESET
+            // RESET STATES
             loopActive = true; isFireworksActive = false;
             document.body.className = '';
             
-            // Ripristino forzato dell'HTML se veniamo dalla schermata finale
-            if(!document.getElementById('days')) {
-                location.reload();
-                return;
-            }
-
-            const container = document.getElementById('main-container');
-            container.style.opacity = '1';
-            document.getElementById('main-title').innerText = "PREPARATI AL LANCIO";
+            // FORCE VISUAL RESET
+            document.getElementById('timer-container').style.display = 'flex';
+            document.getElementById('final-screen').style.display = 'none';
+            document.getElementById('final-screen').style.opacity = '0';
+            
             document.querySelector('.timer-wrapper').style.display = 'flex';
             document.getElementById('secondary-timer').style.display = ''; 
             
@@ -373,80 +428,26 @@
             updateTimers();
         }
 
-        // --- FUNZIONE SCHERMATA FINALE ---
+        // --- TRIGGER FINALE ---
         function triggerFireworksMode() {
             if(isFireworksActive) return; 
             isFireworksActive = true; 
+            
             loopActive = false; 
             manualOverride = true; 
             
+            // Attiva la classe CSS che nasconde il timer e mostra il finale via CSS !important
             document.body.className = 'phase-fireworks'; 
             
-            // Avvia video tempesta/epico
             const video = document.getElementById('video-bg');
             video.style.opacity = '1';
             video.play().catch(e=>{});
             
-            particles = []; // Pulisce particelle vecchie per i fuochi
-
-            const container = document.getElementById('main-container');
-            
-            // Fade out del timer
-            container.style.transition = 'opacity 1s ease';
-            container.style.opacity = '0';
-            
-            setTimeout(() => {
-                // INSERIMENTO NUOVO HTML (Frase Epica + Bottone)
-                container.innerHTML = `
-                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; text-align:center;">
-                        
-                        <img src="https://hytale.com/static/images/logo.png" 
-                             style="width:min(400px, 80vw); margin-bottom: 30px; filter: drop-shadow(0 0 35px rgba(252, 209, 91, 0.6)); animation: float 6s ease-in-out infinite;">
-                        
-                        <h1 style="font-family: 'Lexend', sans-serif; color: #fff; font-size: clamp(2rem, 5vw, 4rem); 
-                                   text-shadow: 0 0 40px rgba(255, 255, 255, 0.5); margin-bottom:10px; line-height:1.1;">
-                            IL PORTALE È APERTO
-                        </h1>
-                        
-                        <p style="font-family: 'Nunito Sans', sans-serif; color: #E6E6E6; font-size: clamp(1rem, 2vw, 1.5rem); 
-                                  letter-spacing: 3px; text-transform:uppercase; margin-bottom:40px; font-weight:600;">
-                            Il tuo viaggio su Orbis inizia oggi.
-                        </p>
-                        
-                        <a href="https://hytale.com" target="_blank" 
-                           style="
-                                font-family: 'Lexend', sans-serif; 
-                                display:inline-block; 
-                                padding:20px 50px; 
-                                border:3px solid #FCD15B; 
-                                background: linear-gradient(135deg, rgba(252, 209, 91, 0.1) 0%, rgba(200, 150, 50, 0.3) 100%); 
-                                color:#FCD15B; 
-                                text-decoration:none; 
-                                font-weight:800; 
-                                font-size: 1.5rem;
-                                text-transform:uppercase; 
-                                border-radius:8px; 
-                                transition:all 0.3s ease; 
-                                box-shadow: 0 0 25px rgba(252,209,91,0.3);
-                                cursor:pointer;
-                           "
-                           onmouseover="this.style.background='rgba(252, 209, 91, 0.9)'; this.style.color='#000'; this.style.boxShadow='0 0 50px rgba(252,209,91,0.8)';"
-                           onmouseout="this.style.background='linear-gradient(135deg, rgba(252, 209, 91, 0.1) 0%, rgba(200, 150, 50, 0.3) 100%)'; this.style.color='#FCD15B'; this.style.boxShadow='0 0 25px rgba(252,209,91,0.3)';"
-                        >
-                            SCARICA IL GIOCO
-                        </a>
-                        
-                    </div>
-                `;
-                
-                // Fade in del nuovo contenuto
-                requestAnimationFrame(() => {
-                    container.style.opacity = '1';
-                });
-            }, 1000);
+            // Reset Particelle per esplosione
+            particles = []; 
         }
 
-        // --- LOGICA TIMER ---
+        // --- TIMER LOGIC ---
         function updateTimers() {
             if(isFireworksActive) return; 
 
@@ -454,16 +455,15 @@
             const diffDown = targetDate - now;
 
             if (!manualOverride) {
-                // SCADENZA (00:00:00)
+                // SCADENZA
                 if (diffDown <= 0) {
-                    // Imposta visualmente a 00 prima di sparire
                     if(document.getElementById("seconds")) document.getElementById("seconds").innerText = "00";
                     triggerFireworksMode();
                     return; 
                 }
                 
-                // FASI TEMPORALI
-                if (diffDown <= 3600000) { // -1 ORA
+                // GESTIONE FASI
+                if (diffDown <= 3600000) { // < 1 ORA
                     if (!document.body.classList.contains('phase-video')) {
                         document.body.className = 'phase-video';
                         document.getElementById('video-bg').play().catch(e => {});
@@ -471,14 +471,14 @@
                         resetInlineStyles();
                     }
                 }
-                else if (diffDown <= 3600000 * 24) { // -24 ORE
+                else if (diffDown <= 3600000 * 24) { // < 24 ORE
                     if (!document.body.classList.contains('phase-24h')) {
                         document.body.className = 'phase-24h';
                         particleColors = ['255, 174, 0', '255, 220, 100']; 
                         resetInlineStyles();
                     }
                 }
-                else if (diffDown <= 3600000 * 24 * 7) { // -1 SETTIMANA
+                else if (diffDown <= 3600000 * 24 * 7) { // < 1 SETTIMANA
                     if (!document.body.classList.contains('phase-week')) {
                         document.body.className = 'phase-week';
                         particleColors = ['46, 255, 80', '200, 255, 200']; 
@@ -494,7 +494,7 @@
                 }
             }
 
-            // Aggiorna numeri
+            // UI Update
             if (diffDown > 0 && !manualOverride) {
                 if(document.getElementById("days")) {
                     document.getElementById("days").innerText = Math.floor(diffDown / 86400000);
@@ -504,7 +504,7 @@
                 }
             }
 
-            // Timer Secondario (Count Up)
+            // Count Up Update
             let years = now.getFullYear() - announceDate.getFullYear();
             let months = now.getMonth() - announceDate.getMonth();
             let days = now.getDate() - announceDate.getDate();
@@ -522,7 +522,7 @@
         }
         setInterval(updateTimers, 1000); updateTimers();
 
-        // --- SISTEMA PARTICELLE ---
+        // --- PARTICLE SYSTEM ---
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
         let width, height, particles = [];
