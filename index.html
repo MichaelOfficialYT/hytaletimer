@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hytale Countdown - Hytale Colors</title>
+    <title>Hytale Countdown - Simplified</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -69,8 +69,7 @@
 
         h1 {
             font-family: 'Lexend', sans-serif;
-            font-weight: 800; 
-            font-size: 2.5rem; 
+            font-weight: 800; font-size: 2.5rem; 
             text-transform: uppercase; letter-spacing: 1px;
             color: #FCD15B; margin: 0 0 5px 0;
             text-shadow: 0 0 15px rgba(252, 209, 91, 0.4); 
@@ -130,59 +129,43 @@
 
         .legal-disclaimer { 
             position: absolute; bottom: 10px; font-size: 0.65rem; color: #777; 
-            text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; opacity: 0.8;
-            font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; opacity: 0.8; font-weight: 600;
         }
 
-        /* --- FASI CLASSICHE --- */
+        /* --- FASI (COLORI SEMPLIFICATI) --- */
+        
+        /* FASE -1 SETTIMANA (VERDE) */
         body.phase-week .bg-gradient { background: radial-gradient(circle at center, rgba(10, 40, 20, 0.9) 0%, rgba(2, 15, 5, 0.98) 100%); }
         body.phase-week h1, body.phase-week .countup-title { color: #5eff80; border-color: #5eff80; text-shadow: 0 0 25px #00ff64; }
         body.phase-week .time-box, body.phase-week .countup-box { border-color: #2eff50; box-shadow: 0 0 20px rgba(46, 255, 80, 0.2); }
         body.phase-week .number, body.phase-week .countup-number { color: #ccffda; }
 
+        /* FASE -24 ORE (ARANCIONE) */
         body.phase-24h .bg-gradient { background: radial-gradient(circle at center, rgba(60, 30, 10, 0.9) 0%, rgba(20, 5, 0, 0.98) 100%); }
         body.phase-24h h1, body.phase-24h .countup-title { color: #ffae00; border-color: #ffae00; text-shadow: 0 0 30px #ff8c00; }
         body.phase-24h .time-box, body.phase-24h .countup-box { border-color: #ffae00; box-shadow: 0 0 25px rgba(255, 174, 0, 0.3); }
         body.phase-24h .number, body.phase-24h .countup-number { color: #fffbd0; }
 
-        /* NEON CYCLE (12 Ore -> 1 Ora) */
-        @keyframes neonCycle {
-            0% { color: #ff00ff; border-color: #ff00ff; text-shadow: 0 0 25px #ff00ff; box-shadow: 0 0 20px rgba(255,0,255,0.4); }
-            25% { color: #00ffff; border-color: #00ffff; text-shadow: 0 0 25px #00ffff; box-shadow: 0 0 20px rgba(0,255,255,0.4); }
-            50% { color: #00ff00; border-color: #00ff00; text-shadow: 0 0 25px #00ff00; box-shadow: 0 0 20px rgba(0,255,0,0.4); }
-            75% { color: #ffff00; border-color: #ffff00; text-shadow: 0 0 25px #ffff00; box-shadow: 0 0 20px rgba(255,255,0,0.4); }
-            100% { color: #ff0000; border-color: #ff0000; text-shadow: 0 0 25px #ff0000; box-shadow: 0 0 20px rgba(255,0,0,0.4); }
-        }
-
-        /* --- FASE VIDEO (-1 ORA & 10 SEC) --- */
+        /* FASE VIDEO (-1 ORA & VIDEO LOOP) */
         body.phase-video #video-bg { opacity: 1 !important; } 
         body.phase-video .bg-img-placeholder { opacity: 0 !important; } 
         body.phase-video .bg-gradient { opacity: 0.2 !important; }
         body.phase-video canvas { opacity: 0; } 
         body.phase-video .countup-section { display: none !important; } 
         
+        /* STILI HYTALE CLASSICI SOPRA IL VIDEO */
         body.phase-video .time-box { 
             background-color: rgba(24, 34, 49, 0.85); 
             border-color: #FCD15B; 
             box-shadow: 0 0 30px rgba(252, 209, 91, 0.3); 
-            animation: none; 
         }
-        body.phase-video h1 { 
+        body.phase-video h1, body.phase-video .number { 
             color: #FCD15B; 
             text-shadow: 0 0 20px rgba(252, 209, 91, 0.6); 
             border-bottom-color: #FCD15B;
-            animation: none; 
-        }
-        body.phase-video .number { 
-            color: #FCD15B; 
-            text-shadow: 0 0 20px rgba(252, 209, 91, 0.5); 
-            animation: none; 
-        }
-        body.phase-video .label {
-            color: #E6E6E6; 
         }
 
-        /* --- FASE FUOCHI (0 SEC) --- */
+        /* FASE FUOCHI (0 SEC) */
         body.phase-fireworks #video-bg { opacity: 1; }
         body.phase-fireworks .countup-section { display: none !important; }
         body.phase-fireworks canvas { opacity: 1; } 
@@ -251,9 +234,8 @@
         <label>Visualizza Fase:</label>
         <select onchange="applyDebug(this.value)" id="debug-selector">
             <option value="">Default (Oro)</option>
-            <option value="phase-week">-1 Settimana</option>
-            <option value="phase-24h">-24 Ore</option>
-            <option value="phase-neon">-12 Ore (Neon)</option>
+            <option value="phase-week">-1 Settimana (Verde)</option>
+            <option value="phase-24h">-24 Ore (Arancione)</option>
             <option value="phase-video">-1 Ora (Video)</option>
         </select>
         
@@ -265,7 +247,7 @@
     </div>
 
     <script>
-        // --- TEXT SCRAMBLE ---
+        // --- TEXT SCRAMBLE UTILITY ---
         class TextScramble {
             constructor(el) { this.el = el; this.chars = '!<>-_\\/[]{}—=+*^?#________'; this.update = this.update.bind(this); }
             setText(newText) {
@@ -294,65 +276,43 @@
             }
             randomChar() { return this.chars[Math.floor(Math.random() * this.chars.length)]; }
         }
+        
+        // --- MESSAGGI CICLICI ---
         const phrases = ["Il destino di Orbis ti attende.", "Gaia ti chiama.", "Un'avventura infinita.", "Preparati al viaggio.", "Ogni blocco racconta una storia."];
         const textElement = document.getElementById('scramble-text');
         const fx = new TextScramble(textElement);
-        let counter = 0;
-        let loopActive = true;
+        let counter = 0; let loopActive = true;
         const nextPhrase = () => { 
             if(!loopActive) return;
             fx.setText(phrases[counter]).then(() => { setTimeout(nextPhrase, 2000); }); counter = (counter + 1) % phrases.length; 
         };
         nextPhrase();
 
-        // --- COLORI NEON ORARI ---
-        const hourlyColors = [
-            '#ffffff', 
-            '#00ffff', '#ff00ff', '#00ff00', '#ffff00', 
-            '#ff0000', '#0000ff', '#ff8000', '#8000ff', 
-            '#00ff80', '#ff0080', '#0080ff', '#80ff00'
-        ];
-
-        // --- CORREZIONE: Funzione helper per conversione HEX -> RGB ---
-        function hexToRgbString(hex) {
-            hex = hex.replace(/^#/, '');
-            let bigint = parseInt(hex, 16);
-            let r = (bigint >> 16) & 255;
-            let g = (bigint >> 8) & 255;
-            let b = bigint & 255;
-            return `${r}, ${g}, ${b}`;
-        }
-
-        // --- GESTIONE DEBUG & LOGICA ---
+        // --- VARIABILI GLOBALI ---
         let manualOverride = false;
         let isFireworksActive = false;
+        // Data target: 13 Gen 2026 ore 15:00 UTC (modifica a piacere)
+        let targetDate = new Date('2026-01-13T15:00:00Z'); 
+        const announceDate = new Date(2018, 11, 13, 18, 0, 0);
 
+        // --- GESTIONE DEBUG ---
         function applyDebug(phase) {
             manualOverride = true;
             document.body.className = phase;
             const video = document.getElementById('video-bg');
             const secondary = document.getElementById('secondary-timer');
 
-            // Reset stili inline
-            resetNeonStyles();
+            resetInlineStyles(); // Pulisce eventuali stili residui
 
             if(phase === 'phase-video') {
                 video.play().catch(e => console.log("Click needed"));
                 particleColors = []; 
-                secondary.style.display = ''; // Lascia gestire al CSS (che ha !important)
+                secondary.style.display = ''; // Lascia gestire al CSS !important
             } else {
-                video.pause();
-                video.style.opacity = '0';
+                video.pause(); video.style.opacity = '0';
                 secondary.style.display = 'block'; 
                 
-                if(phase === 'phase-neon') {
-                    forceTimerDisplay(0, 5, 0, 0);
-                    // Usa la correzione anche qui nel debug
-                    const debugColor = hourlyColors[5];
-                    applyNeonStyle(debugColor);
-                    particleColors = [hexToRgbString(debugColor)];
-                }
-                else if(phase === 'phase-week') {
+                if(phase === 'phase-week') {
                     particleColors = ['46, 255, 80', '200, 255, 200'];
                     forceTimerDisplay(6, 23, 0, 0);
                 }
@@ -361,26 +321,15 @@
                     forceTimerDisplay(0, 23, 59, 0);
                 }
                 else {
+                    // Default Oro
                     particleColors = ['252, 209, 91', '255, 255, 255', '200, 230, 255'];
                 }
             }
         }
 
-        function applyNeonStyle(color) {
-            const h1 = document.querySelector('h1');
-            const cTitle = document.querySelector('.countup-title');
-            const boxes = document.querySelectorAll('.time-box, .countup-box');
-            const numbers = document.querySelectorAll('.number, .countup-number');
-
-            h1.style.color = color; h1.style.borderColor = color; h1.style.textShadow = `0 0 25px ${color}`;
-            if(cTitle) cTitle.style.color = color;
-            boxes.forEach(b => { b.style.borderColor = color; b.style.boxShadow = `0 0 20px ${color}66`; });
-            numbers.forEach(n => { n.style.color = color; });
-        }
-
-        function resetNeonStyles() {
+        function resetInlineStyles() {
             const elements = document.querySelectorAll('h1, .countup-title, .time-box, .countup-box, .number, .countup-number');
-            elements.forEach(el => { el.style = ''; }); // Pulisce tutto lo style inline
+            elements.forEach(el => { el.style = ''; });
         }
 
         function forceTimerDisplay(d, h, m, s) {
@@ -399,33 +348,24 @@
             if (e.key === 'Escape') document.getElementById('debug-controls').style.display = 'none';
         });
 
-        // --- DEBUG 10 SECONDI ---
         function debugFinalTenSeconds() {
             manualOverride = false; 
             targetDate = new Date(new Date().getTime() + 10000); 
-            
-            // RESET
-            loopActive = true;
-            isFireworksActive = false;
+            // Reset stati
+            loopActive = true; isFireworksActive = false;
             document.body.className = '';
             document.getElementById('main-container').style.opacity = '1';
             document.getElementById('main-title').innerText = "PREPARATI AL LANCIO";
             document.querySelector('.timer-wrapper').style.display = 'flex';
-            
-            // Fondamentale: puliamo lo stile inline display:none/block
-            // Così quando la classe .phase-video entra, il CSS !important vince
             document.getElementById('secondary-timer').style.display = ''; 
             document.getElementById('secondary-timer').style.opacity = '';
-            
-            resetNeonStyles();
+            resetInlineStyles();
             particleColors = [];
         }
 
         function triggerFireworksMode() {
             if(isFireworksActive) return; 
-            loopActive = false; 
-            manualOverride = true;
-            isFireworksActive = true; 
+            loopActive = false; manualOverride = true; isFireworksActive = true; 
             
             document.body.className = 'phase-fireworks'; 
             document.getElementById('video-bg').play().catch(e=>{});
@@ -445,10 +385,7 @@
             }, 1000);
         }
 
-        // --- TIMERS ---
-        let targetDate = new Date('2026-01-13T15:00:00Z'); 
-        const announceDate = new Date(2018, 11, 13, 18, 0, 0);
-        
+        // --- MAIN TIMER LOGIC ---
         function updateTimers() {
             if(isFireworksActive) return; 
 
@@ -456,55 +393,48 @@
             const diffDown = targetDate - now;
 
             if (!manualOverride) {
+                // FASE 0: Fine
                 if (diffDown <= 0) {
                     triggerFireworksMode();
                     return; 
                 }
                 
-                // Meno di 1 ORA -> VIDEO MODE
+                // FASE 1: MENO DI 1 ORA -> VIDEO MODE
                 if (diffDown <= 3600000) { 
                     if (!document.body.classList.contains('phase-video')) {
                         document.body.className = 'phase-video';
                         document.getElementById('video-bg').play().catch(e => {});
                         particleColors = []; 
-                        resetNeonStyles();
+                        resetInlineStyles();
                     }
                 }
-                // Meno di 12 ORE -> NEON MODE ORARIO
-                else if (diffDown <= 3600000 * 12) {
-                    const hoursLeft = Math.ceil(diffDown / 3600000);
-                    const color = hourlyColors[hoursLeft] || hourlyColors[12];
-                    
-                    document.body.className = 'phase-neon'; 
-                    applyNeonStyle(color);
-                    // --- CORREZIONE: Convertiamo in RGB per le particelle ---
-                    particleColors = [hexToRgbString(color)];
-                }
-                // Meno di 24 ORE
+                // FASE 2: MENO DI 24 ORE -> ARANCIONE (Copre anche le vecchie 12h)
                 else if (diffDown <= 3600000 * 24) {
                     if (!document.body.classList.contains('phase-24h')) {
                         document.body.className = 'phase-24h';
-                        particleColors = ['255, 174, 0', '255, 220, 100'];
-                        resetNeonStyles();
+                        particleColors = ['255, 174, 0', '255, 220, 100']; // Arancione statico RGB
+                        resetInlineStyles();
                     }
                 }
-                // Meno di 1 SETTIMANA
+                // FASE 3: MENO DI 1 SETTIMANA -> VERDE
                 else if (diffDown <= 3600000 * 24 * 7) {
                     if (!document.body.classList.contains('phase-week')) {
                         document.body.className = 'phase-week';
-                        particleColors = ['46, 255, 80', '200, 255, 200'];
-                        resetNeonStyles();
+                        particleColors = ['46, 255, 80', '200, 255, 200']; // Verde statico RGB
+                        resetInlineStyles();
                     }
                 }
+                // FASE 4: STANDARD -> ORO
                 else {
                     if (document.body.className !== '') {
                         document.body.className = '';
-                        particleColors = ['252, 209, 91', '255, 255, 255', '200, 230, 255'];
-                        resetNeonStyles();
+                        particleColors = ['252, 209, 91', '255, 255, 255', '200, 230, 255']; // Oro/Default RGB
+                        resetInlineStyles();
                     }
                 }
             }
 
+            // Aggiornamento numerico a schermo
             if (diffDown > 0 && !manualOverride) {
                 if(document.getElementById("days")) {
                     document.getElementById("days").innerText = Math.floor(diffDown / 86400000);
@@ -514,7 +444,7 @@
                 }
             }
 
-            // Count Up
+            // Count Up Timer (Tempo dall'annuncio)
             let years = now.getFullYear() - announceDate.getFullYear();
             let months = now.getMonth() - announceDate.getMonth();
             let days = now.getDate() - announceDate.getDate();
@@ -532,7 +462,7 @@
         }
         setInterval(updateTimers, 1000); updateTimers();
 
-        // --- PARTICELLE ---
+        // --- PARTICELLE SYSTEM ---
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
         let width, height, particles = [];
@@ -565,11 +495,8 @@
                 this.speedX = Math.cos(angle) * velocity;
                 this.speedY = Math.sin(angle) * velocity;
                 this.size = Math.random() * 3 + 1;
-                this.opacity = 1;
-                this.life = 1;
-                this.color = color;
-                this.gravity = 0.15;
-                this.friction = 0.96;
+                this.opacity = 1; this.life = 1;
+                this.color = color; this.gravity = 0.15; this.friction = 0.96;
             }
 
             update() {
