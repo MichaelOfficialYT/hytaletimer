@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hytale Countdown - Hytale Colors</title>
+    <title>Hytale Countdown - Early Access</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -318,6 +318,16 @@
             '#00ff80', '#ff0080', '#0080ff', '#80ff00'
         ];
 
+        // --- CORREZIONE: Funzione helper per conversione HEX -> RGB ---
+        function hexToRgbString(hex) {
+            hex = hex.replace(/^#/, '');
+            let bigint = parseInt(hex, 16);
+            let r = (bigint >> 16) & 255;
+            let g = (bigint >> 8) & 255;
+            let b = bigint & 255;
+            return `${r}, ${g}, ${b}`;
+        }
+
         // --- GESTIONE DEBUG & LOGICA ---
         let manualOverride = false;
         let isFireworksActive = false;
@@ -342,8 +352,10 @@
                 
                 if(phase === 'phase-neon') {
                     forceTimerDisplay(0, 5, 0, 0);
-                    applyNeonStyle(hourlyColors[5]);
-                    particleColors = [hourlyColors[5]];
+                    // Usa la correzione anche qui nel debug
+                    const debugColor = hourlyColors[5];
+                    applyNeonStyle(debugColor);
+                    particleColors = [hexToRgbString(debugColor)];
                 }
                 else if(phase === 'phase-week') {
                     particleColors = ['46, 255, 80', '200, 255, 200'];
@@ -470,7 +482,8 @@
                     
                     document.body.className = 'phase-neon'; 
                     applyNeonStyle(color);
-                    particleColors = [color];
+                    // --- CORREZIONE: Convertiamo in RGB per le particelle ---
+                    particleColors = [hexToRgbString(color)];
                 }
                 // Meno di 24 ORE
                 else if (diffDown <= 3600000 * 24) {
