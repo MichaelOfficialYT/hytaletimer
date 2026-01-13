@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hytale Countdown - Final Fixed</title>
+    <title>Hytale Countdown - Fail Safe Version</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,28 +52,30 @@
             pointer-events: none; transition: opacity 1s; 
         }
 
-        /* --- CONTENT --- */
+        /* --- CONTENT CONTAINER (TIMER) --- */
         .container {
             position: relative; z-index: 10; display: flex; flex-direction: column;
             justify-content: center; align-items: center; width: 100%; height: 100vh;
             text-align: center; color: #ffffff; padding: 10px; box-sizing: border-box;
-            transition: opacity 1s, transform 1s;
-        }
-        
-        /* Contenitore Timer (Visibile di default) */
-        #timer-container {
-            display: flex; flex-direction: column; align-items: center; width: 100%;
-            transition: opacity 1s ease;
+            transition: opacity 1s ease; /* Fade out smooth */
         }
 
-        /* Schermata Finale (Nascosta di default) */
+        /* --- SCHERMATA FINALE (OVERLAY INDIPENDENTE) --- */
         #final-screen {
-            display: none; opacity: 0;
+            position: fixed; /* Si sovrappone a tutto */
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 100; /* Molto alto per stare sopra a tutto */
+            display: none; /* Nascosto JS lo attiva */
             flex-direction: column; align-items: center; justify-content: center;
-            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.2); /* Leggero scurimento sfondo */
+            opacity: 0; 
             transition: opacity 2s ease-in;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
+        /* ELEMENTI GRAFICI */
         #hytale-logo {
             width: 250px; height: auto; margin-bottom: 10px;
             filter: drop-shadow(0 0 15px rgba(252, 209, 91, 0.4)); 
@@ -178,8 +180,6 @@
         body.phase-fireworks #video-bg { opacity: 1 !important; }
         body.phase-fireworks .bg-gradient { opacity: 0.2; }
         body.phase-fireworks canvas { opacity: 1 !important; }
-        
-        /* NOTA: Rimosso il display:none !important dal CSS per evitare conflitti con JS */
 
         /* --- STILI PULSANTE FINALE --- */
         .download-btn {
@@ -197,6 +197,7 @@
             transition:all 0.3s ease; 
             box-shadow: 0 0 25px rgba(252,209,91,0.3);
             cursor:pointer;
+            pointer-events: auto; /* IMPORTANTE */
         }
         .download-btn:hover {
             background: rgba(252, 209, 91, 0.9);
@@ -232,55 +233,52 @@
     <canvas id="canvas"></canvas>
 
     <div class="container" id="main-container">
+        <img id="hytale-logo" src="https://hytale.com/static/images/logo.png" alt="Hytale Logo">
+        <h1 id="main-title">PREPARATI AL LANCIO</h1>
+        <p class="subtitle" id="scramble-text"></p>
         
-        <div id="timer-container">
-            <img id="hytale-logo" src="https://hytale.com/static/images/logo.png" alt="Hytale Logo">
-            <h1 id="main-title">PREPARATI AL LANCIO</h1>
-            <p class="subtitle" id="scramble-text"></p>
-            
-            <div class="timer-wrapper">
-                <div class="time-box"><span class="number" id="days">00</span><span class="label">Giorni</span></div>
-                <div class="time-box"><span class="number" id="hours">00</span><span class="label">Ore</span></div>
-                <div class="time-box"><span class="number" id="minutes">00</span><span class="label">Minuti</span></div>
-                <div class="time-box"><span class="number" id="seconds">00</span><span class="label">Secondi</span></div>
-            </div>
-
-            <div class="countup-section" id="secondary-timer">
-                <div class="countup-title">TEMPO DALL'ANNUNCIO DEL GIOCO</div>
-                <div class="countup-wrapper">
-                    <div class="countup-box"><span class="countup-number" id="up-years">0</span><span class="countup-label">Anni</span></div>
-                    <div class="countup-box"><span class="countup-number" id="up-months">0</span><span class="countup-label">Mesi</span></div>
-                    <div class="countup-box"><span class="countup-number" id="up-days">0</span><span class="countup-label">Giorni</span></div>
-                    <div class="countup-box"><span class="countup-number" id="up-hours">00</span><span class="countup-label">Ore</span></div>
-                    <div class="countup-box"><span class="countup-number" id="up-minutes">00</span><span class="countup-label">Min</span></div>
-                    <div class="countup-box"><span class="countup-number" id="up-seconds">00</span><span class="countup-label">Sec</span></div>
-                </div>
-            </div>
+        <div class="timer-wrapper">
+            <div class="time-box"><span class="number" id="days">00</span><span class="label">Giorni</span></div>
+            <div class="time-box"><span class="number" id="hours">00</span><span class="label">Ore</span></div>
+            <div class="time-box"><span class="number" id="minutes">00</span><span class="label">Minuti</span></div>
+            <div class="time-box"><span class="number" id="seconds">00</span><span class="label">Secondi</span></div>
         </div>
 
-        <div id="final-screen">
-            <img src="https://hytale.com/static/images/logo.png" 
-                    style="width:min(400px, 80vw); margin-bottom: 30px; filter: drop-shadow(0 0 35px rgba(252, 209, 91, 0.6)); animation: float 6s ease-in-out infinite;">
-            
-            <h1 style="font-family: 'Lexend', sans-serif; color: #fff; font-size: clamp(2rem, 5vw, 4rem); 
-                        text-shadow: 0 0 40px rgba(255, 255, 255, 0.5); margin-bottom:10px; line-height:1.1;">
-                IL PORTALE È APERTO
-            </h1>
-            
-            <p style="font-family: 'Nunito Sans', sans-serif; color: #E6E6E6; font-size: clamp(1rem, 2vw, 1.5rem); 
-                        letter-spacing: 3px; text-transform:uppercase; margin-bottom:40px; font-weight:600;">
-                Il tuo viaggio su Orbis inizia oggi.
-            </p>
-            
-            <a href="https://hytale.com" target="_blank" class="download-btn">
-                SCARICA IL GIOCO
-            </a>
+        <div class="countup-section" id="secondary-timer">
+            <div class="countup-title">TEMPO DALL'ANNUNCIO DEL GIOCO</div>
+            <div class="countup-wrapper">
+                <div class="countup-box"><span class="countup-number" id="up-years">0</span><span class="countup-label">Anni</span></div>
+                <div class="countup-box"><span class="countup-number" id="up-months">0</span><span class="countup-label">Mesi</span></div>
+                <div class="countup-box"><span class="countup-number" id="up-days">0</span><span class="countup-label">Giorni</span></div>
+                <div class="countup-box"><span class="countup-number" id="up-hours">00</span><span class="countup-label">Ore</span></div>
+                <div class="countup-box"><span class="countup-number" id="up-minutes">00</span><span class="countup-label">Min</span></div>
+                <div class="countup-box"><span class="countup-number" id="up-seconds">00</span><span class="countup-label">Sec</span></div>
+            </div>
         </div>
-
+        
         <div class="legal-disclaimer">
             This site is not affiliated with Hytale or Hypixel Studios.<br>
             Some media are trademarked property of Hypixel Studios!
         </div>
+    </div>
+
+    <div id="final-screen">
+        <img src="https://hytale.com/static/images/logo.png" 
+                style="width:min(400px, 80vw); margin-bottom: 30px; filter: drop-shadow(0 0 35px rgba(252, 209, 91, 0.6)); animation: float 6s ease-in-out infinite;">
+        
+        <h1 style="font-family: 'Lexend', sans-serif; color: #fff; font-size: clamp(2rem, 5vw, 4rem); 
+                    text-shadow: 0 0 40px rgba(255, 255, 255, 0.5); margin-bottom:10px; line-height:1.1;">
+            IL PORTALE È APERTO
+        </h1>
+        
+        <p style="font-family: 'Nunito Sans', sans-serif; color: #E6E6E6; font-size: clamp(1rem, 2vw, 1.5rem); 
+                    letter-spacing: 3px; text-transform:uppercase; margin-bottom:40px; font-weight:600;">
+            Il tuo viaggio su Orbis inizia oggi.
+        </p>
+        
+        <a href="https://hytale.com" target="_blank" class="download-btn">
+            SCARICA IL GIOCO
+        </a>
     </div>
 
     <div id="debug-controls">
@@ -349,7 +347,7 @@
         const announceDate = new Date(2018, 11, 13, 18, 0, 0);
 
         // --- DOM REFERENCES ---
-        const timerContainer = document.getElementById('timer-container');
+        const mainContainer = document.getElementById('main-container');
         const finalScreen = document.getElementById('final-screen');
 
         // --- DEBUG FUNCTIONALITY ---
@@ -360,8 +358,8 @@
             const secondary = document.getElementById('secondary-timer');
 
             // Reset visivi sicuri
-            timerContainer.style.display = 'flex';
-            timerContainer.style.opacity = '1';
+            mainContainer.style.display = 'flex';
+            mainContainer.style.opacity = '1';
             finalScreen.style.display = 'none';
             finalScreen.style.opacity = '0';
             
@@ -420,9 +418,9 @@
             document.body.className = '';
             
             // FORCE VISUAL RESET (JS Driven)
-            timerContainer.style.display = 'flex';
+            mainContainer.style.display = 'flex';
             // Piccola pausa per permettere il reflow prima di settare opacità
-            setTimeout(() => { timerContainer.style.opacity = '1'; }, 10);
+            setTimeout(() => { mainContainer.style.opacity = '1'; }, 10);
             
             finalScreen.style.opacity = '0';
             finalScreen.style.display = 'none';
@@ -453,14 +451,15 @@
             particles = []; 
             
             // LOGICA DI TRANSIZIONE (JS gestisce tutto)
-            // 1. Fade out timer
-            timerContainer.style.opacity = '0';
+            // 1. Fade out timer (Main Container)
+            mainContainer.style.opacity = '0';
             
             // 2. Dopo 1 sec, nascondi timer e mostra finale
             setTimeout(() => {
-                timerContainer.style.display = 'none';
+                // Nascondiamo il timer
+                mainContainer.style.display = 'none';
                 
-                // Prepara finale
+                // Mostriamo il finale (che è position:fixed)
                 finalScreen.style.display = 'flex';
                 // Trigger reflow forzato
                 void finalScreen.offsetWidth; 
