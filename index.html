@@ -247,7 +247,7 @@
     </div>
 
    <script>
-        // --- TEXT SCRAMBLE UTILITY ---
+        // --- TEXT SCRAMBLE UTILITY (Effetto testo iniziale) ---
         class TextScramble {
             constructor(el) { this.el = el; this.chars = '!<>-_\\/[]{}—=+*^?#________'; this.update = this.update.bind(this); }
             setText(newText) {
@@ -277,7 +277,7 @@
             randomChar() { return this.chars[Math.floor(Math.random() * this.chars.length)]; }
         }
         
-        // --- MESSAGGI CICLICI ---
+        // --- FRASI CICLICHE ---
         const phrases = ["Il destino di Orbis ti attende.", "Gaia ti chiama.", "Un'avventura infinita.", "Preparati al viaggio.", "Ogni blocco racconta una storia."];
         const textElement = document.getElementById('scramble-text');
         const fx = new TextScramble(textElement);
@@ -291,7 +291,8 @@
         // --- VARIABILI GLOBALI ---
         let manualOverride = false;
         let isFireworksActive = false;
-        // DATA TARGET DI ESEMPIO (2026)
+        
+        // --- DATA DI LANCIO (Modifica qui) ---
         let targetDate = new Date('2026-01-13T15:00:00Z'); 
         const announceDate = new Date(2018, 11, 13, 18, 0, 0);
 
@@ -349,103 +350,120 @@
 
         function debugFinalTenSeconds() {
             manualOverride = false; 
+            targetDate = new Date(Date.now() + 11000); // 10 secondi + 1 di buffer
             
-            // FIX: Aggiungiamo 11 secondi (non 10) per compensare il delay di esecuzione
-            // In questo modo il Math.floor mostrerà subito "10" e non "9" o "8"
-            targetDate = new Date(Date.now() + 11000); 
-            
-            // RESET TOTALE
-            loopActive = true; 
-            isFireworksActive = false;
+            // RESET
+            loopActive = true; isFireworksActive = false;
             document.body.className = '';
             
-            // Ripristina HTML Timer se necessario (se veniamo dalla schermata finale)
-            const wrapper = document.querySelector('.timer-wrapper');
-            if(!wrapper || wrapper.style.display === 'none') {
-                // Se l'HTML è stato distrutto, ricarichiamo la pagina per sicurezza
-                // oppure ricostruiamo l'HTML, ma il reload è più pulito per il debug
-                if(!document.getElementById('days')) location.reload();
+            // Ripristino forzato dell'HTML se veniamo dalla schermata finale
+            if(!document.getElementById('days')) {
+                location.reload();
+                return;
             }
 
             const container = document.getElementById('main-container');
             container.style.opacity = '1';
-            container.style.display = 'flex';
             document.getElementById('main-title').innerText = "PREPARATI AL LANCIO";
-            
-            if(document.querySelector('.timer-wrapper')) {
-                document.querySelector('.timer-wrapper').style.display = 'flex';
-            }
+            document.querySelector('.timer-wrapper').style.display = 'flex';
             document.getElementById('secondary-timer').style.display = ''; 
             
             resetInlineStyles();
             particleColors = [];
-            
-            // FIX: Aggiorna il timer IMMEDIATAMENTE senza aspettare il prossimo tick di setInterval
             updateTimers();
         }
 
+        // --- FUNZIONE SCHERMATA FINALE ---
         function triggerFireworksMode() {
-            // Impedisce esecuzioni multiple
             if(isFireworksActive) return; 
             isFireworksActive = true; 
-            
-            // Disattiva loop testi e override manuali
             loopActive = false; 
             manualOverride = true; 
             
-            // Attiva classe CSS e Video
             document.body.className = 'phase-fireworks'; 
+            
+            // Avvia video tempesta/epico
             const video = document.getElementById('video-bg');
             video.style.opacity = '1';
             video.play().catch(e=>{});
             
-            // Resetta particelle
-            particles = []; 
+            particles = []; // Pulisce particelle vecchie per i fuochi
 
-            // FIX: Gestione transizione sicura
             const container = document.getElementById('main-container');
             
-            // 1. Fade out del timer attuale
+            // Fade out del timer
             container.style.transition = 'opacity 1s ease';
             container.style.opacity = '0';
             
-            // 2. Dopo 1 secondo, cambia contenuto e fai fade in
             setTimeout(() => {
+                // INSERIMENTO NUOVO HTML (Frase Epica + Bottone)
                 container.innerHTML = `
-                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%;">
-                        <img src="https://hytale.com/static/images/logo.png" style="width:350px; margin-bottom: 20px; filter: drop-shadow(0 0 25px rgba(252, 209, 91, 0.8));">
-                        <h1 style="font-family: 'Lexend', sans-serif; color: #FCD15B; font-size: 3.5rem; text-shadow: 0 0 30px #FCD15B; margin-bottom:10px;">EARLY ACCESS DISPONIBILE</h1>
-                        <p style="font-family: 'Nunito Sans', sans-serif; color: #fff; font-size: 1.5rem; letter-spacing: 2px; text-transform:uppercase; margin-bottom:30px;">Benvenuto su Orbis. Il portale è aperto.</p>
-                        <a href="https://hytale.com" target="_blank" style="font-family: 'Lexend', sans-serif; display:inline-block; padding:15px 30px; border:2px solid #FCD15B; background:rgba(252, 209, 91, 0.1); color:#FCD15B; text-decoration:none; font-weight:bold; text-transform:uppercase; border-radius:5px; transition:0.3s; box-shadow: 0 0 15px rgba(252,209,91,0.2);">SCARICA ORA</a>
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; text-align:center;">
+                        
+                        <img src="https://hytale.com/static/images/logo.png" 
+                             style="width:min(400px, 80vw); margin-bottom: 30px; filter: drop-shadow(0 0 35px rgba(252, 209, 91, 0.6)); animation: float 6s ease-in-out infinite;">
+                        
+                        <h1 style="font-family: 'Lexend', sans-serif; color: #fff; font-size: clamp(2rem, 5vw, 4rem); 
+                                   text-shadow: 0 0 40px rgba(255, 255, 255, 0.5); margin-bottom:10px; line-height:1.1;">
+                            IL PORTALE È APERTO
+                        </h1>
+                        
+                        <p style="font-family: 'Nunito Sans', sans-serif; color: #E6E6E6; font-size: clamp(1rem, 2vw, 1.5rem); 
+                                  letter-spacing: 3px; text-transform:uppercase; margin-bottom:40px; font-weight:600;">
+                            Il tuo viaggio su Orbis inizia oggi.
+                        </p>
+                        
+                        <a href="https://hytale.com" target="_blank" 
+                           style="
+                                font-family: 'Lexend', sans-serif; 
+                                display:inline-block; 
+                                padding:20px 50px; 
+                                border:3px solid #FCD15B; 
+                                background: linear-gradient(135deg, rgba(252, 209, 91, 0.1) 0%, rgba(200, 150, 50, 0.3) 100%); 
+                                color:#FCD15B; 
+                                text-decoration:none; 
+                                font-weight:800; 
+                                font-size: 1.5rem;
+                                text-transform:uppercase; 
+                                border-radius:8px; 
+                                transition:all 0.3s ease; 
+                                box-shadow: 0 0 25px rgba(252,209,91,0.3);
+                                cursor:pointer;
+                           "
+                           onmouseover="this.style.background='rgba(252, 209, 91, 0.9)'; this.style.color='#000'; this.style.boxShadow='0 0 50px rgba(252,209,91,0.8)';"
+                           onmouseout="this.style.background='linear-gradient(135deg, rgba(252, 209, 91, 0.1) 0%, rgba(200, 150, 50, 0.3) 100%)'; this.style.color='#FCD15B'; this.style.boxShadow='0 0 25px rgba(252,209,91,0.3)';"
+                        >
+                            SCARICA IL GIOCO
+                        </a>
+                        
                     </div>
                 `;
                 
-                // Forza il reflow e riporta opacità a 1
+                // Fade in del nuovo contenuto
                 requestAnimationFrame(() => {
                     container.style.opacity = '1';
                 });
             }, 1000);
         }
 
-        // --- MAIN TIMER LOGIC ---
+        // --- LOGICA TIMER ---
         function updateTimers() {
-            // Se siamo già nella fase finale, non fare nulla
             if(isFireworksActive) return; 
 
             const now = new Date();
             const diffDown = targetDate - now;
 
             if (!manualOverride) {
-                // SE IL TEMPO È SCADUTO
+                // SCADENZA (00:00:00)
                 if (diffDown <= 0) {
-                    // Imposta i numeri a 00 prima di cambiare schermata
+                    // Imposta visualmente a 00 prima di sparire
                     if(document.getElementById("seconds")) document.getElementById("seconds").innerText = "00";
                     triggerFireworksMode();
                     return; 
                 }
                 
-                // FASE 1: MENO DI 1 ORA -> VIDEO MODE
-                if (diffDown <= 3600000) { 
+                // FASI TEMPORALI
+                if (diffDown <= 3600000) { // -1 ORA
                     if (!document.body.classList.contains('phase-video')) {
                         document.body.className = 'phase-video';
                         document.getElementById('video-bg').play().catch(e => {});
@@ -453,23 +471,21 @@
                         resetInlineStyles();
                     }
                 }
-                // FASE 2: MENO DI 24 ORE
-                else if (diffDown <= 3600000 * 24) {
+                else if (diffDown <= 3600000 * 24) { // -24 ORE
                     if (!document.body.classList.contains('phase-24h')) {
                         document.body.className = 'phase-24h';
                         particleColors = ['255, 174, 0', '255, 220, 100']; 
                         resetInlineStyles();
                     }
                 }
-                // FASE 3: MENO DI 1 SETTIMANA
-                else if (diffDown <= 3600000 * 24 * 7) {
+                else if (diffDown <= 3600000 * 24 * 7) { // -1 SETTIMANA
                     if (!document.body.classList.contains('phase-week')) {
                         document.body.className = 'phase-week';
                         particleColors = ['46, 255, 80', '200, 255, 200']; 
                         resetInlineStyles();
                     }
                 }
-                else {
+                else { // STANDARD
                     if (document.body.className !== '') {
                         document.body.className = '';
                         particleColors = ['252, 209, 91', '255, 255, 255', '200, 230, 255'];
@@ -478,7 +494,7 @@
                 }
             }
 
-            // Aggiornamento numerico a schermo
+            // Aggiorna numeri
             if (diffDown > 0 && !manualOverride) {
                 if(document.getElementById("days")) {
                     document.getElementById("days").innerText = Math.floor(diffDown / 86400000);
@@ -488,7 +504,7 @@
                 }
             }
 
-            // Count Up Timer
+            // Timer Secondario (Count Up)
             let years = now.getFullYear() - announceDate.getFullYear();
             let months = now.getMonth() - announceDate.getMonth();
             let days = now.getDate() - announceDate.getDate();
@@ -506,7 +522,7 @@
         }
         setInterval(updateTimers, 1000); updateTimers();
 
-        // --- PARTICELLE SYSTEM ---
+        // --- SISTEMA PARTICELLE ---
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
         let width, height, particles = [];
