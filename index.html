@@ -246,7 +246,7 @@
         <div style="margin-top:5px; font-size:10px; color:#aaa;">Premi ESC per chiudere</div>
     </div>
 
-    <script>
+   <script>
         // --- TEXT SCRAMBLE UTILITY ---
         class TextScramble {
             constructor(el) { this.el = el; this.chars = '!<>-_\\/[]{}—=+*^?#________'; this.update = this.update.bind(this); }
@@ -291,7 +291,7 @@
         // --- VARIABILI GLOBALI ---
         let manualOverride = false;
         let isFireworksActive = false;
-        // Data target: 13 Gen 2026 ore 15:00 UTC (modifica a piacere)
+        // DATA TARGET (Modifica qui la data)
         let targetDate = new Date('2026-01-13T15:00:00Z'); 
         const announceDate = new Date(2018, 11, 13, 18, 0, 0);
 
@@ -302,12 +302,12 @@
             const video = document.getElementById('video-bg');
             const secondary = document.getElementById('secondary-timer');
 
-            resetInlineStyles(); // Pulisce eventuali stili residui
+            resetInlineStyles(); 
 
             if(phase === 'phase-video') {
-                video.play().catch(e => console.log("Click needed"));
+                video.play().catch(e => console.log("Click needed for video"));
                 particleColors = []; 
-                secondary.style.display = ''; // Lascia gestire al CSS !important
+                secondary.style.display = ''; 
             } else {
                 video.pause(); video.style.opacity = '0';
                 secondary.style.display = 'block'; 
@@ -321,7 +321,6 @@
                     forceTimerDisplay(0, 23, 59, 0);
                 }
                 else {
-                    // Default Oro
                     particleColors = ['252, 209, 91', '255, 255, 255', '200, 230, 255'];
                 }
             }
@@ -350,38 +349,69 @@
 
         function debugFinalTenSeconds() {
             manualOverride = false; 
-            targetDate = new Date(new Date().getTime() + 10000); 
-            // Reset stati
-            loopActive = true; isFireworksActive = false;
+            targetDate = new Date(new Date().getTime() + 10000); // Imposta timer a 10 secondi da ORA
+            
+            // RESET STATI
+            loopActive = true; 
+            isFireworksActive = false;
             document.body.className = '';
-            document.getElementById('main-container').style.opacity = '1';
+            
+            // Ripristina il contenitore se era stato cancellato
+            const container = document.getElementById('main-container');
+            container.style.opacity = '1';
+            
+            // Ricostruiamo l'HTML originale se necessario (perché triggerFireworks lo cancella)
+            if(!document.getElementById('days')) {
+                location.reload(); // Il modo più sicuro per resettare completamente l'HTML è ricaricare se siamo post-fuochi
+                return;
+            }
+
             document.getElementById('main-title').innerText = "PREPARATI AL LANCIO";
             document.querySelector('.timer-wrapper').style.display = 'flex';
             document.getElementById('secondary-timer').style.display = ''; 
-            document.getElementById('secondary-timer').style.opacity = '';
+            
             resetInlineStyles();
             particleColors = [];
         }
 
         function triggerFireworksMode() {
             if(isFireworksActive) return; 
-            loopActive = false; manualOverride = true; isFireworksActive = true; 
+            
+            // BLOCCO IMMEDIATO DI TUTTO
+            isFireworksActive = true; 
+            loopActive = false; 
+            manualOverride = true; 
             
             document.body.className = 'phase-fireworks'; 
-            document.getElementById('video-bg').play().catch(e=>{});
-            particles = []; 
+            
+            // Assicuriamo che il video continui a funzionare
+            const video = document.getElementById('video-bg');
+            video.style.opacity = '1';
+            video.play().catch(e=>{});
+            
+            particles = []; // Resetta particelle per preparare i fuochi
 
             const container = document.getElementById('main-container');
-            container.style.opacity = 0;
             
+            // Fase 1: Fade Out del vecchio timer
+            container.style.transition = 'opacity 1s ease';
+            container.style.opacity = '0';
+            
+            // Fase 2: Cambio contenuto dopo 1 secondo
             setTimeout(() => {
+                // Sostituisce l'HTML
                 container.innerHTML = `
-                    <img src="https://hytale.com/static/images/logo.png" style="width:350px; margin-bottom: 20px; filter: drop-shadow(0 0 25px rgba(252, 209, 91, 0.8));">
-                    <h1 style="font-family: 'Lexend', sans-serif; color: #FCD15B; font-size: 3.5rem; text-shadow: 0 0 30px #FCD15B;">EARLY ACCESS DISPONIBILE</h1>
-                    <p style="font-family: 'Nunito Sans', sans-serif; color: #fff; font-size: 1.5rem; letter-spacing: 2px; text-transform:uppercase;">Benvenuto su Orbis. Il portale è aperto.</p>
-                    <a href="https://hytale.com" target="_blank" style="font-family: 'Lexend', sans-serif; margin-top:20px; display:inline-block; padding:15px 30px; border:2px solid #FCD15B; color:#FCD15B; text-decoration:none; font-weight:bold; text-transform:uppercase; border-radius:5px; transition:0.3s;">SCARICA ORA</a>
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%;">
+                        <img src="https://hytale.com/static/images/logo.png" style="width:350px; margin-bottom: 20px; filter: drop-shadow(0 0 25px rgba(252, 209, 91, 0.8));">
+                        <h1 style="font-family: 'Lexend', sans-serif; color: #FCD15B; font-size: 3.5rem; text-shadow: 0 0 30px #FCD15B; margin-bottom:10px;">EARLY ACCESS DISPONIBILE</h1>
+                        <p style="font-family: 'Nunito Sans', sans-serif; color: #fff; font-size: 1.5rem; letter-spacing: 2px; text-transform:uppercase; margin-bottom:30px;">Benvenuto su Orbis. Il portale è aperto.</p>
+                        <a href="https://hytale.com" target="_blank" style="font-family: 'Lexend', sans-serif; display:inline-block; padding:15px 30px; border:2px solid #FCD15B; background:rgba(252, 209, 91, 0.1); color:#FCD15B; text-decoration:none; font-weight:bold; text-transform:uppercase; border-radius:5px; transition:0.3s; box-shadow: 0 0 15px rgba(252,209,91,0.2);">SCARICA ORA</a>
+                    </div>
                 `;
-                container.style.opacity = 1;
+                // Fase 3: Fade In del nuovo contenuto
+                requestAnimationFrame(() => {
+                    container.style.opacity = '1';
+                });
             }, 1000);
         }
 
@@ -393,7 +423,7 @@
             const diffDown = targetDate - now;
 
             if (!manualOverride) {
-                // FASE 0: Fine
+                // SE IL TEMPO È SCADUTO (o quasi)
                 if (diffDown <= 0) {
                     triggerFireworksMode();
                     return; 
@@ -408,27 +438,26 @@
                         resetInlineStyles();
                     }
                 }
-                // FASE 2: MENO DI 24 ORE -> ARANCIONE (Copre anche le vecchie 12h)
+                // FASE 2: MENO DI 24 ORE
                 else if (diffDown <= 3600000 * 24) {
                     if (!document.body.classList.contains('phase-24h')) {
                         document.body.className = 'phase-24h';
-                        particleColors = ['255, 174, 0', '255, 220, 100']; // Arancione statico RGB
+                        particleColors = ['255, 174, 0', '255, 220, 100']; 
                         resetInlineStyles();
                     }
                 }
-                // FASE 3: MENO DI 1 SETTIMANA -> VERDE
+                // FASE 3: MENO DI 1 SETTIMANA
                 else if (diffDown <= 3600000 * 24 * 7) {
                     if (!document.body.classList.contains('phase-week')) {
                         document.body.className = 'phase-week';
-                        particleColors = ['46, 255, 80', '200, 255, 200']; // Verde statico RGB
+                        particleColors = ['46, 255, 80', '200, 255, 200']; 
                         resetInlineStyles();
                     }
                 }
-                // FASE 4: STANDARD -> ORO
                 else {
                     if (document.body.className !== '') {
                         document.body.className = '';
-                        particleColors = ['252, 209, 91', '255, 255, 255', '200, 230, 255']; // Oro/Default RGB
+                        particleColors = ['252, 209, 91', '255, 255, 255', '200, 230, 255'];
                         resetInlineStyles();
                     }
                 }
@@ -444,7 +473,7 @@
                 }
             }
 
-            // Count Up Timer (Tempo dall'annuncio)
+            // Count Up Timer
             let years = now.getFullYear() - announceDate.getFullYear();
             let months = now.getMonth() - announceDate.getMonth();
             let days = now.getDate() - announceDate.getDate();
